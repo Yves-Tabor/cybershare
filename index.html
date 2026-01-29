@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShare | Secure Networking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0a0b0d;
+            --card-bg: #14161a;
+            --primary: #4A9EFF;
+            --text-main: #e1e1e1;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --error: #ff4a4a;
+            --success: #4aff9e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-main);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0);
+            background-size: 40px 40px;
+            z-index: -1;
+        }
+
+        header {
+            position: fixed;
+            top: 0; width: 100%;
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 8%;
+            background: rgba(10, 11, 13, 0.8);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+
+        .logo span { color: var(--primary); }
+
+        .btn {
+            padding: 8px 20px;
+            font-size: 0.85rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .btn-login { background: transparent; color: var(--text-main); border: 1px solid var(--border); margin-right: 10px; }
+        .btn-signup { background: var(--primary); color: #000; border: none; }
+        .btn-signup:hover { opacity: 0.9; }
+
+        .hero {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 10%;
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .tagline {
+            color: var(--text-dim);
+            font-size: 1rem;
+            max-width: 500px;
+            letter-spacing: 1px;
+        }
+
+        .features { padding: 4rem 10%; }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            border-radius: 12px;
+            transition: border 0.3s ease;
+        }
+
+        .feature-card:hover { border-color: var(--primary); }
+        .feature-card h3 { color: var(--primary); font-size: 1rem; margin-bottom: 10px; text-transform: uppercase; }
+        .feature-card p { font-size: 0.9rem; color: var(--text-dim); }
+
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none; justify-content: center; align-items: center;
+            z-index: 2000;
+        }
+
+        .modal {
+            background: #1a1d23;
+            padding: 2.5rem;
+            border-radius: 16px;
+            width: 100%; max-width: 380px;
+            border: 1px solid var(--border);
+        }
+
+        .modal input {
+            width: 100%; padding: 12px;
+            margin-bottom: 1rem;
+            background: #0d0e12;
+            border: 1px solid var(--border);
+            color: white; border-radius: 6px;
+        }
+
+        .modal input:focus { outline: 1px solid var(--primary); }
+        
+        /* Message Paragraph Style */
+        .auth-msg {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: center;
+            min-height: 1.2rem;
+        }
+        .msg-error { color: var(--error); }
+        .msg-success { color: var(--success); }
+
+        .modal-active { display: flex; }
+        
+        /* Unverified User Styling */
+        .unverified-user {
+            background: rgba(0, 0, 0, 0.5) !important;
+            border: 1px solid rgba(92, 92, 92, 0.738) !important;
+        }
+        
+        .unverified-badge {
+            background: rgba(255, 235, 59, 0.2);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .verification-warning {
+            background: black;
+            border: 1px solid black;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-overlay"></div>
+
+    <header>
+        <div class="logo">CYBER<span>SHARE</span></div>
+        <div class="auth-buttons">
+            <button class="btn btn-login" onclick="toggleModal('loginModal')">Login</button>
+            <button class="btn btn-signup" onclick="toggleModal('signupModal')">Join</button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Connect.</h1>
+        <p class="tagline">"Secure your websites. Share your knowledge."</p>
+    </section>
+
+    <section class="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>Encryption</h3>
+                <p>Protecting your website doesn't have to be complicated. Stay ahead of threats.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Resources</h3>
+                <p>Share knowledge, links, and meeting reports within a secure environment.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Community</h3>
+                <p>A world where websites are secured and the community is connected.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <h2 style="margin-bottom: 1.5rem">Login</h2>
+            <form id="loginForm">
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <button type="submit" class="btn btn-signup" style="width: 100%">Enter System</button>
+                <p id="loginMsg" class="auth-msg"></p>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="signupModal">
+        <div class="modal">
+            <h2 style="margin-bottom: 1.5rem">Sign Up</h2>
+            <form id="signupForm">
+                <input type="text" id="signupName" placeholder="Full Name" required>
+                <input type="email" id="signupEmail" placeholder="Email" required>
+                <input type="password" id="signupPassword" placeholder="Password" required>
+                <button type="submit" class="btn btn-signup" style="width: 100%">Create Account</button>
+                <p id="signupMsg" class="auth-msg"></p>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCiCPymL7UVi1PWRDQVyRYNn2z9HNjC1V0",
+            authDomain: "cybershare-001.firebaseapp.com",
+            projectId: "cybershare-001",
+            storageBucket: "cybershare-001.firebasestorage.app",
+            messagingSenderId: "300595987814",
+            appId: "1:300595987814:web:f1a81e68926cba2553b4a7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const displayMsg = (elementId, message, isError = true) => {
+            const el = document.getElementById(elementId);
+            el.innerText = message;
+            el.className = isError ? "auth-msg msg-error" : "auth-msg msg-success";
+        };
+
+        // Sign Up Logic
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const name = document.getElementById('signupName').value;
+
+            displayMsg("signupMsg", "Processing...", false);
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await sendEmailVerification(userCredential.user);
+                
+                localStorage.setItem('username', name.toUpperCase());
+                localStorage.setItem('isVerified', 'false');
+
+                displayMsg("signupMsg", "Account created! Verify email to post.", false);
+                setTimeout(() => { window.location.href = 'home.html'; }, 2000);
+            } catch (error) {
+                displayMsg("signupMsg", error.message);
+            }
+        });
+
+        // Login Logic
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            displayMsg("loginMsg", "Authenticating...", false);
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                localStorage.setItem('username', email.split('@')[0].toUpperCase());
+                localStorage.setItem('isVerified', user.emailVerified);
+
+                if (!user.emailVerified) {
+                    // Mark user as unverified
+                    document.getElementById('loginModal').classList.add('unverified-user');
+                    displayMsg("loginMsg", "⚠️ Unverified User. Please check your email and click the verification link.", true);
+                    
+                    // Add verification warning
+                    const existingWarning = document.querySelector('.verification-warning');
+                    if (!existingWarning) {
+                        const warning = document.createElement('div');
+                        warning.className = 'verification-warning';
+                        warning.innerHTML = `
+                            <strong>EMAIL VERIFICATION REQUIRED</strong><br>
+                            Check your inbox for the verification email.<br>
+                            <small>If not received, check spam folder or <a href="#" onclick="resendVerification()" style="color: #ffeb3b;">resend verification</a></small>
+                        `;
+                        document.getElementById('loginForm').appendChild(warning);
+                    }
+                    
+                    // Add unverified badge to header
+                    const authButtons = document.querySelector('.auth-buttons');
+                    const existingBadge = document.querySelector('.unverified-badge');
+                    if (!existingBadge) {
+                        const badge = document.createElement('span');
+                        badge.className = 'unverified-badge';
+                        badge.textContent = 'UNVERIFIED';
+                        badge.style.marginLeft = '10px';
+                        authButtons.appendChild(badge);
+                    }
+                    
+                    return; // Don't redirect if not verified
+                }
+
+                // Remove unverified styling if verified
+                document.getElementById('loginModal').classList.remove('unverified-user');
+                const warning = document.querySelector('.verification-warning');
+                if (warning) warning.remove();
+                const badge = document.querySelector('.unverified-badge');
+                if (badge) badge.remove();
+
+                displayMsg("loginMsg", "Access Granted. Redirecting...", false);
+                setTimeout(() => { window.location.href = '/home.html'; }, 1000);
+            } catch (error) {
+                displayMsg("loginMsg", "Invalid credentials.");
+            }
+        });
+
+        // Resend verification function
+        window.resendVerification = async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                await sendEmailVerification(userCredential.user);
+                displayMsg("loginMsg", "✅ Verification email resent! Check your inbox.", false);
+            } catch (error) {
+                displayMsg("loginMsg", "Failed to resend verification email.", true);
+            }
+        };
+    </script>
+
+    <script>
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            const msg = modal.querySelector('.auth-msg');
+            if(msg) msg.innerText = "";
+            modal.classList.toggle('modal-active');
+        }
+        
+        window.onclick = function(event) {
+            if (event.target.className === 'modal-overlay modal-active') {
+                event.target.classList.remove('modal-active');
+            }
+        }
+    </script>
+
+    <script>
+        // Check for unverified user on page load
+        window.addEventListener('load', () => {
+            const isVerified = localStorage.getItem('isVerified');
+            const username = localStorage.getItem('username');
+            
+            if (username && isVerified === 'false') {
+                // Mark user as unverified in UI
+                const authButtons = document.querySelector('.auth-buttons');
+                const badge = document.createElement('span');
+                badge.className = 'unverified-badge';
+                badge.textContent = 'UNVERIFIED_USER';
+                badge.style.marginLeft = '10px';
+                authButtons.appendChild(badge);
+                
+                // Add yellow styling to login modal
+                document.getElementById('loginModal').classList.add('unverified-user');
+            }
+        });
+    </script>
+</body>
+</html>

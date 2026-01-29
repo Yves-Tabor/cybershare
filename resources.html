@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShare - Resources</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cyber-dark': '#0A0E1A',
+                        'cyber-darker': '#060911',
+                        'cyber-blue': '#00D9FF',
+                        'cyber-purple': '#8B5CF6',
+                        'cyber-green': '#10B981',
+                        'cyber-red': '#EF4444',
+                        'cyber-yellow': '#F59E0B',
+                    },
+                    fontFamily: {
+                        'mono': ['JetBrains Mono', 'monospace'],
+                        'sans': ['Sora', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        .bw-body { background-color: #000 !important; color: #fff !important; }
+        .bw-card { background: #000; border: 1px solid #fff; border-radius: 12px; }
+        .bw-input { background: #000; border: 1px solid #fff; color: #fff; border-radius: 8px; }
+        .bw-input:focus { background: #fff; color: #000; outline: none; }
+        .bw-btn { background: transparent; border: 1px solid #fff; color: #fff; transition: all 0.2s; border-radius: 8px; }
+        .bw-btn:hover { background: #fff; color: #000; }
+
+        .highlight-post {
+            animation: highlight-flash 2s ease-in-out;
+        }
+
+        @keyframes highlight-flash {
+            0%, 100% { border-color: #fff; }
+            50% { border-color: #00D9FF; background-color: rgba(0, 217, 255, 0.05); }
+        }
+
+        .search-result-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-result-item:hover {
+            background-color: #1a1a1a;
+            border-color: #00D9FF;
+        }
+    </style>
+</head>
+<body class="bw-body font-sans overflow-x-hidden">
+    <nav class="bg-[#0A0B0D] backdrop-blur-xl border-b border-white/5 sticky top-0 z-50">
+        <div class="max-w-[1800px] mx-auto px-6">
+            <div class="hidden xl:flex items-center justify-between h-20">
+                <div class="flex items-center space-x-8">
+                    <div class="flex flex-col border-r border-white/10 pr-8">
+                        <span class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">User</span>
+                        <span id="currentUserDisplay" class="text-gray-500 font-semibold text-sm uppercase">LOADING...</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-white to-black rounded flex items-center justify-center shadow-[0_0_4px_white]">
+                            <span class="text-white font-bold text-xs">CS</span>
+                        </div>
+                        <span class="font-bold text-xl font-mono tracking-tighter uppercase">Cyber<span class="text-white">Share</span></span>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-8 items-center">
+                    <a href="home.html" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase">HOME</a>
+                    <a href="scanner.html" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase">SCANNER</a>
+                    <a href="resources.html" class="text-white font-mono text-[12px] transition tracking-widest uppercase text-cyber-blue">RESOURCES</a>
+                    <button onclick="toggleModal('protocolModal')" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase">Protocol</button>
+                    <div class="h-6 w-[1px] bg-white/10 mx-2"></div>
+                    
+                    <button onclick="toggleModal('searchModal')" class="relative p-2 bg-white/5 border border-white/10 rounded-lg group transition-all hover:bg-white/10">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </button>
+
+                    <button onclick="handleLogout()" class="px-4 py-2 bg-black border-2 border-white text-white hover:bg-gray-800 rounded-lg text-[10px] transition uppercase">Logout</button>
+                </div>
+            </div>
+
+            <div class="xl:hidden">
+                <div class="flex items-center justify-between h-20">
+                    <div class="flex items-center space-x-4">
+                        <div class="hidden sm:flex flex-col">
+                            <span class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">User</span>
+                            <span id="currentUserDisplayMobile" class="text-gray-500 font-semibold text-sm uppercase">LOADING...</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-6 h-6 bg-gradient-to-br from-white to-black rounded flex items-center justify-center shadow-[0_0_4px_white]">
+                                <span class="text-white font-bold text-[8px]">CS</span>
+                            </div>
+                            <span class="font-bold text-lg font-mono tracking-tighter uppercase">Cyber<span class="text-white">Share</span></span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="toggleMobileMenu()" class="p-2 bg-white/5 border border-white/10 rounded-lg group transition-all hover:bg-white/10">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="mobileMenu" class="hidden pb-4 space-y-3">
+                    <div class="flex flex-col space-y-2">
+                        <a href="home.html" class="text-white font-mono text-[12px] transition tracking-widest uppercase py-2 px-4 hover:bg-white/10 rounded">HOME</a>
+                        <a href="scanner.html" class="text-white font-mono text-[12px] transition tracking-widest uppercase py-2 px-4 hover:bg-white/10 rounded">SCANNER</a>
+                        <a href="resources.html" class="text-cyber-blue font-mono text-[12px] transition tracking-widest uppercase py-2 px-4 hover:bg-white/10 rounded">RESOURCES</a>
+                        <button onclick="toggleModal('protocolModal')" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase py-2 px-4 hover:bg-white/10 rounded text-left">PROTOCOL</button>
+                    </div>
+                    
+                    <div class="border-t border-white/10 pt-3 flex items-center justify-between">
+                        <button onclick="toggleModal('searchModal')" class="relative p-2 bg-white/5 border border-white/10 rounded-lg group transition-all hover:bg-white/10">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </button>
+                        <button onclick="handleLogout()" class="px-4 py-2 bg-black border-2 border-white text-white hover:bg-gray-800 rounded-lg text-[10px] transition uppercase">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-6 py-20">
+        <div class="text-center mb-16">
+            <h1 class="text-7xl font-bold mb-4 tracking-tighter lowercase">Knowledge Hub</h1>
+            <p class="text-zinc-500 font-mono text-sm tracking-widest underline decoration-white decoration-2 underline-offset-8">MONOCHROME RESOURCE INTERFACE</p>
+        </div>
+
+        <div class="bw-card p-8">
+            <form id="resourceForm" class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase mb-3 tracking-[0.3em] text-zinc-400">Resource Title [Entry Required]</label>
+                    <input type="text" id="titleInput" placeholder="ENTER RESOURCE TITLE..." class="bw-input w-full p-4 text-base font-mono lowercase" required>
+                </div>
+                
+                <div>
+                    <label class="block text-[10px] font-bold uppercase mb-3 tracking-[0.3em] text-zinc-400">Content</label>
+                    <textarea id="contentInput" placeholder="ENTER RESOURCE CONTENT..." class="bw-input w-full p-4 h-24 text-base font-mono lowercase" required></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-[10px] font-bold uppercase mb-3 tracking-[0.3em] text-zinc-400">File Attachments</label>
+                    <div id="dropZone" class="bw-input w-full p-8 h-32 text-base font-mono lowercase border-2 border-dashed border-gray-600 hover:border-cyber-blue transition-colors cursor-pointer flex flex-col items-center justify-center">
+                        <svg class="w-12 h-12 text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        <p class="text-gray-400 text-sm font-mono">Drag & drop files here</p>
+                        <p class="text-gray-600 text-xs font-mono mt-1">or click to browse</p>
+                    </div>
+                    <input type="file" id="fileInput" class="hidden" multiple>
+                    <div id="attachedFilesList" class="mt-4 space-y-2"></div>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button type="submit" class="bw-btn flex-1 py-4 font-bold uppercase tracking-widest font-mono text-sm">Publish Resource</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="resourceStatus" class="mt-12 text-center font-mono text-zinc-600 text-[10px] uppercase tracking-[0.5em]">
+            Standby // Loading resources...
+        </div>
+
+        <div id="resourceFeed" class="mt-8 space-y-6"></div>
+    </main>
+
+    <!-- Search Modal -->
+    <div id="searchModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="toggleModal('searchModal')"></div>
+        <div class="bg-black border-2 border-white w-full max-w-2xl rounded-xl relative shadow-2xl max-h-[80vh] flex flex-col">
+            <div class="p-6 border-b border-white/20">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-bold text-white text-xl tracking-tighter lowercase">Search Resources</h2>
+                    <button onclick="toggleModal('searchModal')" class="text-gray-500 hover:text-white text-2xl">&times;</button>
+                </div>
+                <input type="text" id="searchInput" placeholder="Search by title or content..." class="bw-input w-full p-4 text-base font-mono lowercase" oninput="handleSearch()">
+            </div>
+            <div id="searchResults" class="flex-1 overflow-y-auto p-6 space-y-3">
+                <div class="text-center py-10 text-gray-600 font-mono text-xs uppercase">Type to search resources...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comment Modal -->
+    <div id="commentModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeCommentModal()"></div>
+        <div class="bg-black border-2 border-white w-full max-w-2xl rounded-xl relative shadow-2xl max-h-[80vh] flex flex-col">
+            <div class="p-6 border-b border-white/20">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 id="commentResourceTitle" class="font-bold text-white text-xl tracking-tighter lowercase">Resource Comments</h2>
+                        <p id="commentCount" class="text-[10px] text-gray-500 font-mono mt-1 uppercase">0 COMMENTS</p>
+                    </div>
+                    <button onclick="closeCommentModal()" class="text-gray-500 hover:text-white text-2xl">&times;</button>
+                </div>
+            </div>
+            <div id="commentsList" class="flex-1 overflow-y-auto p-6 space-y-4">
+                <div class="text-center py-10 text-gray-600 font-mono text-xs uppercase">Loading comments...</div>
+            </div>
+            <div class="p-6 border-t border-white/20">
+                <textarea id="commentText" placeholder="TYPE YOUR COMMENT..." class="bw-input w-full p-4 h-24 mb-4 resize-none font-mono text-sm lowercase"></textarea>
+                <button onclick="submitComment()" class="bw-btn w-full py-3 font-bold uppercase tracking-widest font-mono text-sm">Post Comment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Protocol Modal -->
+    <div id="protocolModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="toggleModal('protocolModal')"></div>
+        <div class="bg-black border-2 border-white w-full max-w-md rounded-xl p-8 relative shadow-2xl">
+            <h2 class="font-bold text-white mb-6 text-xl tracking-tighter lowercase">System Protocols</h2>
+            <ul class="space-y-4 font-mono text-xs text-gray-400">
+                <li><span class="text-white">[01]</span> NO_SPAM: Excessive broadcasting throttles your node.</li>
+                <li><span class="text-white">[02]</span> INTEGRITY: Hostile code is automatically scrubbed.</li>
+                <li><span class="text-white">[03]</span> UPLINK: Posts are persistent and visible to all nodes.</li>
+                <li><span class="text-white">[04]</span> RESOURCES: All files are shareable across the network.</li>
+            </ul>
+            <button onclick="toggleModal('protocolModal')" class="mt-8 w-full py-3 border border-white text-white hover:bg-gray-800 transition-all text-[14px] lowercase tracking-tighter">Acknowledge</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCiCPymL7UVi1PWRDQVyRYNn2z9HNjC1V0",
+            authDomain: "cybershare-001.firebaseapp.com",
+            projectId: "cybershare-001",
+            storageBucket: "cybershare-001.firebasestorage.app",
+            messagingSenderId: "300595987814",
+            appId: "1:300595987814:web:f1a81e68926cba2553b4a7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+
+        let currentUser = "";
+        let currentUserEmail = "";
+        let attachedFiles = [];
+        let allResources = [];
+        let currentResourceId = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Check email verification
+                if (!user.emailVerified) {
+                    console.log("Unverified user detected, logging out...");
+                    auth.signOut();
+                    localStorage.clear();
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                currentUserEmail = user.email;
+                currentUser = user.email.split('@')[0].toUpperCase().replace(/[^A-Z0-9]/g, '_');
+                document.getElementById('currentUserDisplay').innerText = currentUser;
+                const mobileDisplay = document.getElementById('currentUserDisplayMobile');
+                if (mobileDisplay) mobileDisplay.innerText = currentUser;
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        const q = query(collection(db, "resources"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            allResources = [];
+            snapshot.forEach(doc => {
+                allResources.push({ id: doc.id, ...doc.data() });
+            });
+            renderResources(allResources);
+        });
+
+        function renderResources(resources) {
+            const feed = document.getElementById('resourceFeed');
+            const status = document.getElementById('resourceStatus');
+            
+            if (resources.length === 0) {
+                status.innerText = "Standby // No resources published yet";
+                feed.innerHTML = '';
+                return;
+            }
+            
+            status.innerText = `Active // ${resources.length} resource(s) in feed`;
+            feed.innerHTML = resources.map(resource => createPostElement(resource)).join('');
+        }
+
+        window.handleSearch = () => {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (!searchTerm) {
+                resultsContainer.innerHTML = '<div class="text-center py-10 text-gray-600 font-mono text-xs uppercase">Type to search resources...</div>';
+                return;
+            }
+            
+            const results = allResources.filter(r => 
+                r.title.toLowerCase().includes(searchTerm) || 
+                r.content.toLowerCase().includes(searchTerm)
+            );
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<div class="text-center py-10 text-gray-600 font-mono text-xs uppercase">No results found</div>';
+                return;
+            }
+            
+            resultsContainer.innerHTML = results.map(r => `
+                <div class="search-result-item p-4 border border-gray-800 rounded-lg" onclick="scrollToResource('${r.id}')">
+                    <h3 class="font-bold text-white mb-1">${r.title}</h3>
+                    <p class="text-sm text-gray-400 mb-2 line-clamp-2">${r.content}</p>
+                    <div class="flex items-center gap-4 text-xs text-gray-500">
+                        <span>By: ${r.username}</span>
+                        <span>•</span>
+                        <span>${r.files?.length || 0} files</span>
+                        <span>•</span>
+                        <span>${r.commentCount || 0} comments</span>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        window.scrollToResource = (id) => {
+            toggleModal('searchModal');
+            const el = document.getElementById(`resource-${id}`);
+            if (el) {
+                window.scrollTo({ top: el.offsetTop - 100, behavior: 'smooth' });
+                el.classList.add('highlight-post');
+                setTimeout(() => el.classList.remove('highlight-post'), 2000);
+            }
+        };
+
+        document.getElementById('resourceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('titleInput').value;
+            const content = document.getElementById('contentInput').value;
+            
+            if (!title.trim() || !content.trim()) {
+                alert("ERROR: Title and content cannot be empty");
+                return;
+            }
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerText = "TRANSMITTING...";
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            try {
+                console.log("Attempting to broadcast resource...");
+                
+                // Store files in IndexedDB for larger files, but upload metadata only
+                const filesData = await Promise.all(attachedFiles.map(async (file, index) => {
+                    const cacheKey = `resource_file_${Date.now()}_${index}`;
+                    
+                    // Check file size and decide storage method
+                    if (file.size > 50 * 1024 * 1024) { // 50MB+
+                        // For large files, store only metadata (no actual file)
+                        return {
+                            name: file.name,
+                            size: file.size,
+                            type: file.type,
+                            url: `large-file://${cacheKey}`, // Large file indicator
+                            path: `large-file/${cacheKey}`,
+                            cacheKey: cacheKey,
+                            isLarge: true
+                        };
+                    } else {
+                        // For smaller files, store in IndexedDB
+                        try {
+                            await storeFileInIndexedDB(cacheKey, file);
+                            return {
+                                name: file.name,
+                                size: file.size,
+                                type: file.type,
+                                url: `indexeddb://${cacheKey}`, // IndexedDB URL
+                                path: `indexeddb/${cacheKey}`,
+                                cacheKey: cacheKey,
+                                isLarge: false
+                            };
+                        } catch (error) {
+                            console.warn('IndexedDB storage failed, falling back to metadata only:', error);
+                            return {
+                                name: file.name,
+                                size: file.size,
+                                type: file.type,
+                                url: `metadata-only://${cacheKey}`, // Metadata only
+                                path: `metadata-only/${cacheKey}`,
+                                cacheKey: cacheKey,
+                                isLarge: true
+                            };
+                        }
+                    }
+                }));
+                
+                // Add resource to Firestore with cache URLs
+                const docRef = await addDoc(collection(db, "resources"), {
+                    username: currentUser,
+                    authorEmail: currentUserEmail,
+                    title: title,
+                    content: content,
+                    files: filesData,
+                    timestamp: serverTimestamp(),
+                    commentCount: 0
+                });
+                
+                console.log(" Resource published with ID:", docRef.id);
+                
+                btn.innerText = "SUCCESS!";
+                btn.classList.remove('bg-transparent');
+                btn.classList.add('bg-green-500', 'text-black');
+                
+                setTimeout(() => {
+                    btn.innerText = "Publish Resource";
+                    btn.classList.remove('bg-green-500', 'text-black');
+                    btn.classList.add('bg-transparent');
+                }, 2000);
+                
+                // Reset form
+                document.getElementById('resourceForm').reset();
+                attachedFiles = [];
+                displayAttachedFiles();
+                
+            } catch (e) {
+                console.error(" Resource Transmission Failed:", e);
+                
+                let errorMsg = "CRITICAL_FAILURE: ";
+                if (e.code === 'permission-denied') {
+                    errorMsg += "Firestore rules blocking write. Check Firebase Console";
+                } else if (e.code === 'unavailable') {
+                    errorMsg += "Network issue. Check internet connectivity";
+                } else {
+                    errorMsg += e.message;
+                }
+                
+                alert(errorMsg);
+                
+                btn.innerText = "FAILED - RETRY";
+                btn.classList.add('bg-red-500');
+                
+                setTimeout(() => {
+                    btn.innerText = "Publish Resource";
+                    btn.classList.remove('bg-red-500');
+                }, 3000);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        });
+
+        function createPostElement(r) {
+            const timeAgo = r.timestamp?.toDate ? getRelativeTime(r.timestamp.toDate()) : 'Just now';
+            
+            return `
+                <div id="resource-${r.id}" class="bw-card p-6">
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-white to-black rounded-full flex items-center justify-center">
+                            <span class="text-black font-bold text-xs">${r.username.substring(0, 2)}</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white">${r.username}</h3>
+                            <p class="text-sm text-gray-400 font-mono">@${r.username.toLowerCase()} • ${timeAgo}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h2 class="text-xl font-bold text-white mb-2">${r.title}</h2>
+                        <p class="text-gray-300 leading-relaxed">${r.content}</p>
+                    </div>
+
+                    ${r.files?.length ? `
+                        <div class="space-y-2 mb-4">
+                            <p class="text-xs text-gray-500 font-mono uppercase mb-2">Attached Files:</p>
+                            ${r.files.map((f, index) => `
+                                <div class="bg-black border border-gray-700 rounded-lg p-3 flex items-center justify-between hover:border-cyber-blue/50 transition">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-cyber-blue to-cyber-purple rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-white text-sm">${f.name}</p>
+                                            <p class="text-xs text-gray-400 font-mono">${formatFileSize(f.size)} • ${f.type || 'File'}</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="initiateAdvancedDownload('${r.id}', ${index}, '${f.name}', '${f.url}', ${f.size})" class="px-4 py-2 bg-cyber-blue/20 text-cyber-blue rounded-lg hover:bg-cyber-blue hover:text-black transition font-medium text-xs uppercase">
+                                        Turbo Download
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-800">
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-cyber-blue/10 text-cyber-blue rounded-full text-xs font-mono">#Resource</span>
+                            <span class="px-3 py-1 bg-cyber-purple/10 text-cyber-purple rounded-full text-xs font-mono">#Knowledge</span>
+                        </div>
+                        <button onclick="openCommentModal('${r.id}', '${r.title}')" class="flex items-center gap-2 px-4 py-2 border border-white/20 hover:border-cyber-blue text-gray-400 hover:text-cyber-blue rounded-lg transition font-mono text-xs uppercase">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                            ${r.commentCount > 0 ? `${r.commentCount} Comments` : 'Comment'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.openCommentModal = (id, title) => {
+            currentResourceId = id;
+            document.getElementById('commentResourceTitle').innerText = title;
+            toggleModal('commentModal');
+            
+            const q = query(collection(db, `resources/${id}/comments`), orderBy("timestamp", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const comments = [];
+                snapshot.forEach(doc => comments.push({ id: doc.id, ...doc.data() }));
+                document.getElementById('commentCount').innerText = `${comments.length} COMMENT${comments.length !== 1 ? 'S' : ''}`;
+                renderComments(comments);
+            });
+        };
+
+        window.closeCommentModal = () => {
+            toggleModal('commentModal');
+            currentResourceId = null;
+            document.getElementById('commentText').value = '';
+        };
+
+        function renderComments(comments) {
+            const container = document.getElementById('commentsList');
+            if (comments.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-gray-600 font-mono text-xs uppercase">No comments yet. Be the first!</div>';
+                return;
+            }
+            container.innerHTML = comments.map(c => `
+                <div class="bg-black border border-gray-800 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-cyber-blue to-cyber-purple rounded-full flex items-center justify-center">
+                            <span class="text-white font-bold text-xs">${c.username.substring(0, 2)}</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-bold text-white text-sm">${c.username}</span>
+                                <span class="text-xs text-gray-500 font-mono">${c.time}</span>
+                            </div>
+                            <p class="text-gray-300 text-sm">${c.text}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.submitComment = async () => {
+            const text = document.getElementById('commentText').value.trim();
+            if (!text || !currentResourceId) {
+                alert("ERROR: Comment cannot be empty");
+                return;
+            }
+            
+            try {
+                await addDoc(collection(db, `resources/${currentResourceId}/comments`), {
+                    username: currentUser,
+                    userEmail: currentUserEmail,
+                    text: text,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    timestamp: serverTimestamp()
+                });
+                
+                const resourceRef = doc(db, 'resources', currentResourceId);
+                const currentResource = allResources.find(r => r.id === currentResourceId);
+                await updateDoc(resourceRef, {
+                    commentCount: (currentResource?.commentCount || 0) + 1
+                });
+                
+                document.getElementById('commentText').value = '';
+            } catch (e) {
+                return e.message;
+            }
+        };
+
+        function getRelativeTime(date) {
+            const now = new Date();
+            const diff = now - date;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (seconds < 60) return 'Just now';
+            if (minutes < 60) return `${minutes} min ago`;
+            if (hours < 24) return `${hours} hour ago`;
+            return date.toLocaleDateString();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
+            dropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }, false);
+        });
+        ['dragenter', 'dragover'].forEach(e => {
+            dropZone.addEventListener(e, () => dropZone.classList.add('border-cyber-blue', 'bg-cyber-blue/5'), false);
+        });
+        ['dragleave', 'drop'].forEach(e => {
+            dropZone.addEventListener(e, () => dropZone.classList.remove('border-cyber-blue', 'bg-cyber-blue/5'), false);
+        });
+        dropZone.addEventListener('drop', (e) => handleFiles(e.dataTransfer.files), false);
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            attachedFiles = attachedFiles.concat(Array.from(files));
+            displayAttachedFiles();
+        }
+
+        function displayAttachedFiles() {
+            const list = document.getElementById('attachedFilesList');
+            list.innerHTML = '';
+            attachedFiles.forEach((file, i) => {
+                const div = document.createElement('div');
+                div.className = 'bg-black border border-gray-700 rounded-lg p-3 flex items-center justify-between';
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-cyber-blue to-cyber-purple rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-white text-sm">${file.name}</p>
+                            <p class="text-xs text-gray-400 font-mono">${formatFileSize(file.size)}</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="window.removeFile(${i})" class="px-2 py-1 bg-cyber-red/20 text-cyber-red rounded hover:bg-cyber-red/30 transition font-medium text-xs">Remove</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        window.removeFile = (i) => {
+            attachedFiles.splice(i, 1);
+            displayAttachedFiles();
+        };
+
+        // IndexedDB storage for larger files
+        async function storeFileInIndexedDB(key, file) {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('CyberShareDB', 1);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    const db = request.result;
+                    const transaction = db.transaction(['files'], 'readwrite');
+                    const store = transaction.objectStore('files');
+                    
+                    const putRequest = store.put({ key: key, file: file });
+                    putRequest.onerror = () => reject(putRequest.error);
+                    putRequest.onsuccess = () => resolve();
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains('files')) {
+                        db.createObjectStore('files');
+                    }
+                };
+            });
+        }
+
+        async function getFileFromIndexedDB(key) {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('CyberShareDB', 1);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    const db = request.result;
+                    const transaction = db.transaction(['files'], 'readonly');
+                    const store = transaction.objectStore('files');
+                    
+                    const getRequest = store.get(key);
+                    getRequest.onerror = () => reject(getRequest.error);
+                    getRequest.onsuccess = () => resolve(getRequest.result?.file);
+                };
+            });
+        }
+
+        // Advanced High-Performance Download System
+        window.initiateAdvancedDownload = (resourceId, fileIndex, fileName, fileUrl, fileSize) => {
+            // Create advanced download modal
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md';
+            modal.innerHTML = `
+                <div class="bg-black border-2 border-white w-full max-w-2xl rounded-xl p-8 relative shadow-2xl">
+                    <h3 class="font-bold text-white text-xl mb-6 tracking-tighter lowercase">Turbo Download Protocol</h3>
+                    <div class="space-y-4 mb-6">
+                        <div class="bg-black border border-gray-700 rounded-lg p-4">
+                            <p class="text-sm text-gray-400 font-mono mb-2">File Information:</p>
+                            <p class="text-white font-semibold">${fileName}</p>
+                            <p class="text-xs text-gray-500 font-mono">Size: ${formatFileSize(fileSize)} • Type: ${getFileExtension(fileName)}</p>
+                        </div>
+                        <div class="bg-cyber-blue/10 border border-cyber-blue/30 rounded-lg p-4">
+                            <p class="text-xs text-cyber-blue font-mono mb-2">DOWNLOAD ENGINE:</p>
+                            <p class="text-white font-mono text-sm">Turbo Mode • Chunked Transfer • Resume Ready</p>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs font-mono">
+                                <span class="text-gray-400">Progress</span>
+                                <span id="downloadProgress" class="text-cyber-blue">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-800 rounded-full h-2">
+                                <div id="downloadBar" class="bg-cyber-blue h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs font-mono">
+                                <span id="downloadSpeed" class="text-gray-500">0 MB/s</span>
+                                <span id="downloadEta" class="text-gray-500">--:--</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <button onclick="startTurboDownload('${fileName}', '${fileUrl}', ${fileSize}, this)" class="w-full py-3 bg-cyber-blue text-black hover:bg-cyber-blue/80 transition font-bold uppercase tracking-widest font-mono text-sm">
+                            Initialize Turbo Download
+                        </button>
+                        <button onclick="this.closest('.fixed').remove()" class="w-full py-3 border border-white text-white hover:bg-gray-800 transition font-mono text-sm uppercase">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        };
+
+        window.startTurboDownload = async (fileName, fileUrl, fileSize, button) => {
+            const modal = button.closest('.fixed');
+            const progressEl = modal.querySelector('#downloadProgress');
+            const barEl = modal.querySelector('#downloadBar');
+            const speedEl = modal.querySelector('#downloadSpeed');
+            const etaEl = modal.querySelector('#downloadEta');
+            
+            button.disabled = true;
+            button.innerText = "INITIALIZING TURBO MODE...";
+            
+            // Check URL type
+            const isDemo = fileUrl.includes('fake-download-url.com');
+            const isCached = fileUrl.includes('cache://');
+            const isIndexedDB = fileUrl.includes('indexeddb://');
+            const isLargeFile = fileUrl.includes('large-file://');
+            const isMetadataOnly = fileUrl.includes('metadata-only://');
+            
+            if (isDemo) {
+                // Simulate download for demo purposes
+                button.innerText = "TURBO DOWNLOAD ACTIVE";
+                let progress = 0;
+                const startTime = Date.now();
+                
+                const interval = setInterval(() => {
+                    progress += Math.random() * 8 + 2; // 2-10% increments
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        // Show completion
+                        button.innerText = "DOWNLOAD COMPLETE";
+                        button.classList.remove('bg-cyber-blue', 'text-black');
+                        button.classList.add('bg-cyber-green', 'text-white');
+                        progressEl.textContent = "100%";
+                        barEl.style.width = "100%";
+                        speedEl.textContent = "Complete";
+                        etaEl.textContent = "00:00";
+                        
+                        // Success message
+                        setTimeout(() => {
+                            const message = document.createElement('div');
+                            message.className = 'absolute inset-0 bg-black/95 flex items-center justify-center rounded-xl';
+                            message.innerHTML = `
+                                <div class="text-center">
+                                    <div class="w-16 h-16 bg-cyber-green rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-white font-bold text-lg mb-2">Demo Download Complete</h4>
+                                    <p class="text-gray-400 text-sm font-mono">${fileName}</p>
+                                    <p class="text-cyber-green text-xs font-mono mt-2">${formatFileSize(fileSize)} • Simulation Mode</p>
+                                    <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-cyber-green text-black font-bold uppercase tracking-widest font-mono text-xs">
+                                        Close
+                                    </button>
+                                </div>
+                            `;
+                            modal.appendChild(message);
+                        }, 1000);
+                    } else {
+                        const elapsed = (Date.now() - startTime) / 1000;
+                        const speed = (fileSize / (1024 * 1024)) / elapsed; // MB/s
+                        const remaining = (100 - progress) / (progress / elapsed);
+                        
+                        progressEl.textContent = `${progress.toFixed(1)}%`;
+                        barEl.style.width = `${progress}%`;
+                        speedEl.textContent = `${speed.toFixed(2)} MB/s`;
+                        etaEl.textContent = formatTime(remaining);
+                    }
+                }, 200);
+                
+            } else if (isIndexedDB) {
+                // Download from IndexedDB (real file, larger capacity)
+                button.innerText = "TURBO DOWNLOAD ACTIVE";
+                let progress = 0;
+                const startTime = Date.now();
+                const cacheKey = fileUrl.replace('indexeddb://', '');
+                
+                try {
+                    // Retrieve file from IndexedDB
+                    const file = await getFileFromIndexedDB(cacheKey);
+                    if (!file) {
+                        throw new Error('File not found in IndexedDB');
+                    }
+                    
+                    // Simulate download progress
+                    const interval = setInterval(() => {
+                        progress += Math.random() * 10 + 5; // 5-15% increments
+                        if (progress >= 100) {
+                            progress = 100;
+                            clearInterval(interval);
+                            
+                            // Create blob and trigger download
+                            const url = window.URL.createObjectURL(file);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = fileName;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            window.URL.revokeObjectURL(url);
+                            
+                            // Show completion
+                            button.innerText = "DOWNLOAD COMPLETE";
+                            button.classList.remove('bg-cyber-blue', 'text-black');
+                            button.classList.add('bg-cyber-green', 'text-white');
+                            progressEl.textContent = "100%";
+                            barEl.style.width = "100%";
+                            speedEl.textContent = "Complete";
+                            etaEl.textContent = "00:00";
+                            
+                            // Success message
+                            setTimeout(() => {
+                                const message = document.createElement('div');
+                                message.className = 'absolute inset-0 bg-black/95 flex items-center justify-center rounded-xl';
+                                message.innerHTML = `
+                                    <div class="text-center">
+                                        <div class="w-16 h-16 bg-cyber-green rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </div>
+                                        <h4 class="text-white font-bold text-lg mb-2">IndexedDB Download Complete</h4>
+                                        <p class="text-gray-400 text-sm font-mono">${fileName}</p>
+                                        <p class="text-cyber-green text-xs font-mono mt-2">${formatFileSize(fileSize)} • High-Capacity Storage</p>
+                                        <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-cyber-green text-black font-bold uppercase tracking-widest font-mono text-xs">
+                                            Close
+                                        </button>
+                                    </div>
+                                `;
+                                modal.appendChild(message);
+                            }, 1000);
+                        } else {
+                            const elapsed = (Date.now() - startTime) / 1000;
+                            const speed = (fileSize / (1024 * 1024)) / elapsed; // MB/s
+                            const remaining = (100 - progress) / (progress / elapsed);
+                            
+                            progressEl.textContent = `${progress.toFixed(1)}%`;
+                            barEl.style.width = `${progress}%`;
+                            speedEl.textContent = `${speed.toFixed(2)} MB/s`;
+                            etaEl.textContent = formatTime(remaining);
+                        }
+                    }, 150);
+                    
+                } catch (error) {
+                    console.error('IndexedDB download failed:', error);
+                    button.innerText = "DOWNLOAD FAILED";
+                    button.classList.add('bg-cyber-red', 'text-white');
+                    alert(`IndexedDB download failed: ${error.message}`);
+                }
+                
+            } else if (isLargeFile || isMetadataOnly) {
+                // Large file or metadata only - show info message
+                button.innerText = "PROCESSING...";
+                
+                setTimeout(() => {
+                    const message = document.createElement('div');
+                    message.className = 'absolute inset-0 bg-black/95 flex items-center justify-center rounded-xl';
+                    message.innerHTML = `
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-cyber-yellow rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <h4 class="text-white font-bold text-lg mb-2">Large File Detected</h4>
+                            <p class="text-gray-400 text-sm font-mono">${fileName}</p>
+                            <p class="text-cyber-yellow text-xs font-mono mt-2">${formatFileSize(fileSize)} • Storage Limit Exceeded</p>
+                            <p class="text-gray-500 text-xs mt-4">Files larger than 50MB are stored as metadata only to prevent browser storage issues.</p>
+                            <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-cyber-yellow text-black font-bold uppercase tracking-widest font-mono text-xs">
+                                Understood
+                            </button>
+                        </div>
+                    `;
+                    modal.appendChild(message);
+                }, 1000);
+                
+            } else if (isCached) {
+                // Download from browser cache (real file)
+                button.innerText = "TURBO DOWNLOAD ACTIVE";
+                let progress = 0;
+                const startTime = Date.now();
+                const cacheKey = fileUrl.replace('cache://', '');
+                
+                try {
+                    // Retrieve file from cache
+                    const cachedData = localStorage.getItem(cacheKey);
+                    if (!cachedData) {
+                        throw new Error('File not found in cache');
+                    }
+                    
+                    // Simulate download progress
+                    const interval = setInterval(() => {
+                        progress += Math.random() * 12 + 3; // 3-15% increments (faster for cache)
+                        if (progress >= 100) {
+                            progress = 100;
+                            clearInterval(interval);
+                            
+                            // Create blob from cached data and trigger download
+                            const a = document.createElement('a');
+                            a.href = cachedData;
+                            a.download = fileName;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            
+                            // Show completion
+                            button.innerText = "DOWNLOAD COMPLETE";
+                            button.classList.remove('bg-cyber-blue', 'text-black');
+                            button.classList.add('bg-cyber-green', 'text-white');
+                            progressEl.textContent = "100%";
+                            barEl.style.width = "100%";
+                            speedEl.textContent = "Complete";
+                            etaEl.textContent = "00:00";
+                            
+                            // Success message
+                            setTimeout(() => {
+                                const message = document.createElement('div');
+                                message.className = 'absolute inset-0 bg-black/95 flex items-center justify-center rounded-xl';
+                                message.innerHTML = `
+                                    <div class="text-center">
+                                        <div class="w-16 h-16 bg-cyber-green rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </div>
+                                        <h4 class="text-white font-bold text-lg mb-2">Cache Download Complete</h4>
+                                        <p class="text-gray-400 text-sm font-mono">${fileName}</p>
+                                        <p class="text-cyber-green text-xs font-mono mt-2">${formatFileSize(fileSize)} • Instant Access</p>
+                                        <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-cyber-green text-black font-bold uppercase tracking-widest font-mono text-xs">
+                                            Close
+                                        </button>
+                                    </div>
+                                `;
+                                modal.appendChild(message);
+                            }, 1000);
+                        } else {
+                            const elapsed = (Date.now() - startTime) / 1000;
+                            const speed = (fileSize / (1024 * 1024)) / elapsed; // MB/s
+                            const remaining = (100 - progress) / (progress / elapsed);
+                            
+                            progressEl.textContent = `${progress.toFixed(1)}%`;
+                            barEl.style.width = `${progress}%`;
+                            speedEl.textContent = `${speed.toFixed(2)} MB/s`;
+                            etaEl.textContent = formatTime(remaining);
+                        }
+                    }, 100); // Faster updates for cache
+                    
+                } catch (error) {
+                    console.error('Cache download failed:', error);
+                    button.innerText = "DOWNLOAD FAILED";
+                    button.classList.add('bg-cyber-red', 'text-white');
+                    alert(`Cache download failed: ${error.message}`);
+                }
+                
+            } else {
+                // Real download for actual files
+                try {
+                    const response = await fetch(fileUrl);
+                    if (!response.ok) throw new Error('Download failed');
+                    
+                    const contentLength = response.headers.get('Content-Length');
+                    const total = parseInt(contentLength, 10) || fileSize;
+                    let loaded = 0;
+                    
+                    const reader = response.body.getReader();
+                    const chunks = [];
+                    const startTime = Date.now();
+                    let lastUpdateTime = startTime;
+                    
+                    button.innerText = "TURBO DOWNLOAD ACTIVE";
+                    
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        
+                        if (done) break;
+                        
+                        chunks.push(value);
+                        loaded += value.length;
+                        
+                        // Update progress every 100ms
+                        const now = Date.now();
+                        if (now - lastUpdateTime > 100) {
+                            const progress = Math.min((loaded / total) * 100, 100);
+                            const elapsed = (now - startTime) / 1000;
+                            const speed = loaded / (1024 * 1024) / elapsed; // MB/s
+                            const remaining = (total - loaded) / (speed * 1024 * 1024); // seconds
+                            
+                            progressEl.textContent = `${progress.toFixed(1)}%`;
+                            barEl.style.width = `${progress}%`;
+                            speedEl.textContent = `${speed.toFixed(2)} MB/s`;
+                            etaEl.textContent = formatTime(remaining);
+                            
+                            lastUpdateTime = now;
+                        }
+                    }
+                    
+                    // Create blob and trigger download
+                    const blob = new Blob(chunks);
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    // Show completion
+                    button.innerText = "DOWNLOAD COMPLETE";
+                    button.classList.remove('bg-cyber-blue', 'text-black');
+                    button.classList.add('bg-cyber-green', 'text-white');
+                    progressEl.textContent = "100%";
+                    barEl.style.width = "100%";
+                    speedEl.textContent = "Complete";
+                    etaEl.textContent = "00:00";
+                    
+                    // Success message
+                    setTimeout(() => {
+                        const message = document.createElement('div');
+                        message.className = 'absolute inset-0 bg-black/95 flex items-center justify-center rounded-xl';
+                        message.innerHTML = `
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-cyber-green rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-white font-bold text-lg mb-2">Turbo Download Complete</h4>
+                                <p class="text-gray-400 text-sm font-mono">${fileName}</p>
+                                <p class="text-cyber-green text-xs font-mono mt-2">${formatFileSize(fileSize)} • High-Speed Transfer</p>
+                                <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-cyber-green text-black font-bold uppercase tracking-widest font-mono text-xs">
+                                    Close
+                                </button>
+                            </div>
+                        `;
+                        modal.appendChild(message);
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error('Download failed:', error);
+                    button.innerText = "DOWNLOAD FAILED";
+                    button.classList.add('bg-cyber-red', 'text-white');
+                    alert(`Download failed: ${error.message}`);
+                }
+            }
+        };
+
+        function getFileExtension(fileName) {
+            const ext = fileName.split('.').pop().toUpperCase();
+            return ext || 'FILE';
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds) || !isFinite(seconds)) return '--:--';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        window.toggleMobileMenu = () => document.getElementById('mobileMenu').classList.toggle('hidden');
+        window.toggleModal = (id) => document.getElementById(id).classList.toggle('hidden');
+        window.handleLogout = async () => {
+            try {
+                await auth.signOut();
+                localStorage.clear();
+                window.location.href = 'index.html';
+            } catch (e) {
+                console.error("Logout failed:", e);
+            }
+        };
+    </script>
+</body>
+</html>

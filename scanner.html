@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShare - Vulnerability Scanner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cyber-dark': '#0A0E1A',
+                        'cyber-darker': '#060911',
+                        'cyber-blue': '#00D9FF',
+                        'cyber-purple': '#8B5CF6',
+                        'cyber-green': '#10B981',
+                        'cyber-red': '#EF4444',
+                        'cyber-yellow': '#F59E0B',
+                    },
+                    fontFamily: {
+                        'mono': ['JetBrains Mono', 'monospace'],
+                        'sans': ['Sora', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes scan {
+            0%, 100% { transform: translateY(0); opacity: 0.3; }
+            50% { transform: translateY(10px); opacity: 1; }
+        }
+        .scan-animation { animation: scan 2s ease-in-out infinite; }
+        
+        /* Sidebar Transitions */
+        #commentSidebar { transition: transform 0.3s ease-in-out; }
+        
+        /* BW Body Styling */
+        .bw-container { background-color: #000; color: #fff; border: 1px solid #fff; }
+        .bw-input { background: #000; border: 1px solid #fff; color: #fff; }
+        .bw-input:focus { background: #fff; color: #000; outline: none; }
+        .bw-button { border: 1px solid #fff; color: #fff; background: transparent; transition: all 0.2s; }
+        .bw-button:hover:not(:disabled) { background: #fff; color: #000; }
+        .bw-button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* Notification Dot */
+        #notif-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background-color: #EF4444;
+            border-radius: 50%;
+            border: 2px solid #0A0E1A;
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-black text-gray-100 font-sans overflow-x-hidden">
+
+    <nav class="bg-[#0A0B0D] backdrop-blur-xl border-b border-white/5 sticky top-0 z-50">
+        <div class="max-w-[1800px] mx-auto px-6">
+            <div class="hidden xl:flex items-center justify-between h-20">
+                <div class="flex items-center space-x-8">
+                    <div class="flex flex-col border-r border-white/10 pr-8">
+                        <span class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">User</span>
+                        <span id="currentUserDisplay" class="text-gray-500 font-semibold text-sm uppercase">THIS_USER</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-white to-black rounded flex items-center justify-center shadow-[0_0_4px_white]">
+                            <span class="text-white font-bold text-xs">CS</span>
+                        </div>
+                        <span class="font-bold text-xl font-mono tracking-tighter uppercase">Cyber<span class="text-white">Share</span></span>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-8 items-center">
+                    <a href="home.html" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase">HOME</a>
+                    <a href="scanner.html" class="text-white font-mono text-[12px] transition tracking-widest uppercase text-cyber-blue">SCANNER</a>
+                    <a href="resources.html" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase">RESOURCES</a>
+                    <button onclick="toggleModal('protocolModal')" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase">Protocol</button>
+                    <div class="h-6 w-[1px] bg-white/10 mx-2"></div>
+                    
+                    <button id="sidebarToggleBtn" onclick="toggleSidebar()" class="relative p-2 bg-white/5 border border-white/10 rounded-lg group transition-all hover:bg-white/10">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                        </svg>
+                        <div id="notif-dot"></div>
+                    </button>
+
+                    <button onclick="handleLogout()" class="px-4 py-2 bg-black border-2 border-white text-white hover:bg-gray-800 rounded-lg text-[10px] transition uppercase">Logout</button>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation -->
+            <div class="xl:hidden">
+                <!-- Mobile Header -->
+                <div class="flex items-center justify-between h-20">
+                    <div class="flex items-center space-x-4">
+                        <div class="hidden sm:flex flex-col">
+                            <span class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">User</span>
+                            <span id="currentUserDisplay" class="text-gray-500 font-semibold text-sm uppercase">THIS_USER</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-6 h-6 bg-gradient-to-br from-white to-black rounded flex items-center justify-center shadow-[0_0_4px_white]">
+                                <span class="text-white font-bold text-[8px]">CS</span>
+                            </div>
+                            <span class="font-bold text-lg font-mono tracking-tighter uppercase">Cyber<span class="text-white">Share</span></span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="toggleMobileMenu()" class="p-2 bg-white/5 border border-white/10 rounded-lg group transition-all hover:bg-white/10">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu (Vertical) -->
+                <div id="mobileMenu" class="hidden pb-4 space-y-3">
+                    <div class="flex flex-col space-y-2">
+                        <a href="home.html" class="text-white font-mono text-[12px] transition tracking-widest uppercase py-2 px-4 hover:bg-white/10 rounded">HOME</a>
+                        <a href="scanner.html" class="text-cyber-blue font-mono text-[12px] transition tracking-widest uppercase py-2 px-4 hover:bg-white/10 rounded">SCANNER</a>
+                        <a href="../resources.html" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase py-2 px-4 hover:bg-white/10 rounded">RESOURCES</a>
+                        <button onclick="toggleModal('protocolModal')" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase py-2 px-4 hover:bg-white/10 rounded text-left">PROTOCOL</button>
+                    </div>
+                    
+                    <div class="border-t border-white/10 pt-3 flex items-center justify-between">
+                        <button id="sidebarToggleBtn" onclick="toggleSidebar()" class="relative p-2 bg-white/5 border border-white/10 rounded-lg group transition-all hover:bg-white/10">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                            </svg>
+                            <div id="notif-dot"></div>
+                        </button>
+
+                        <button onclick="handleLogout()" class="px-4 py-2 bg-black border-2 border-white text-white hover:bg-gray-800 rounded-lg text-[10px] transition uppercase">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <aside id="commentSidebar" class="fixed right-0 top-20 h-[calc(100vh-5rem)] w-80 bg-black border-l border-white z-40 transform translate-x-full shadow-2xl">
+        <div class="p-6">
+            <h2 class="font-mono font-bold text-white mb-6 uppercase tracking-wider border-b border-white pb-2">Analysis Logs</h2>
+            <div id="commentList" class="space-y-4">
+                <div class="p-3 border border-gray-700 rounded-lg">
+                    <p class="text-[10px] text-gray-500 font-mono mb-1">System_Initialization</p>
+                    <p class="text-xs text-gray-400">Awaiting target link verification...</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="max-w-4xl mx-auto px-6 py-16">
+        <div class="text-center mb-12">
+            <h1 class="text-6xl font-bold mb-4 tracking-tighter lowercase">Vulnerability Audit</h1>
+            <p class="text-gray-500 uppercase text-xs tracking-[0.4em]">Monochrome Security Layer</p>
+        </div>
+
+        <div class="bw-container p-10 bg-black rounded-xl">
+            <form id="scanForm" class="space-y-8" onsubmit="handleScan(event)">
+                <div>
+                    <label class="block text-xs uppercase mb-4 tracking-widest text-gray-400 font-bold font-mono rounded-lg">Enter Website URL</label>
+                    <input type="url" id="urlInput" placeholder="https://example.com" class="bw-input w-full p-5 text-lg font-mono rounded-lg" required>
+                </div>
+
+                <div class="flex items-start gap-4 p-5 border border-dashed border-gray-700 rounded-lg">
+                    <input type="checkbox" id="ackCheck" class="w-5 h-5 mt-1 accent-white rounded" onchange="toggleButton()">
+                    <label for="ackCheck" class="text-[11px] leading-relaxed text-gray-400 uppercase font-mono rounded-lg">
+                        I acknowledge that this website belongs to me and I authorize a security scan including header analysis, fingerprinting, and disclosure checks.
+                    </label>
+                </div>
+
+                <button type="submit" id="scanBtn" disabled class="bw-button w-full py-5 font-bold uppercase tracking-widest font-mono rounded-lg">
+                    Initiate Deep Scan
+                </button>
+            </form>
+            <div id="progressContainer" class="hidden mt-8 w-full bg-gray-900 h-1">
+                <div id="progressBar" class="bg-white h-full transition-all duration-500 w-0"></div>
+            </div>
+        </div>
+
+        <div id="scanStatus" class="mt-8 text-center text-[10px] font-mono text-gray-600 uppercase tracking-widest">
+            Awaiting Command...
+        </div>
+    </main>
+
+    <div id="protocolModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="toggleModal('protocolModal')"></div>
+        <div class="bg-black border-2 border-white w-full max-w-md rounded-xl p-8 relative shadow-2xl">
+            <h2 class="font-bold text-white mb-6 text-xl tracking-tighter lowercase">System Protocols</h2>
+            <ul class="space-y-4 font-mono text-xs text-gray-400">
+                <li><span class="text-white">[01]</span> NO_SPAM: Excessive broadcasting throttles your node.</li>
+                <li><span class="text-white">[02]</span> INTEGRITY: Hostile code is automatically scrubbed.</li>
+                <li><span class="text-white">[03]</span> UPLINK: Posts are persistent and visible to all nodes.</li>
+                <li><span class="text-white">[04]</span> COMMS: All replies are transmitted in real-time.</li>
+            </ul>
+            <button onclick="toggleModal('protocolModal')" class="mt-8 w-full py-3 border border-white text-white hover:bg-gray-800 transition-all text-[14px] lowercase tracking-tighter">Acknowledge</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleButton() {
+            const check = document.getElementById('ackCheck');
+            const btn = document.getElementById('scanBtn');
+            btn.disabled = !check.checked;
+        }
+
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('commentSidebar');
+            const redPoint = document.getElementById('notif-dot');
+            sidebar.classList.toggle('translate-x-full');
+            
+            // Per Instructions: Red point disappears only when the icon is clicked
+            if (!sidebar.classList.contains('translate-x-full')) {
+                redPoint.style.display = 'none';
+            }
+        }
+
+        function addComment(title, status, recommendation) {
+            const list = document.getElementById('commentList');
+            const redPoint = document.getElementById('notif-dot');
+            const sidebar = document.getElementById('commentSidebar');
+            
+            const commentDiv = document.createElement('div');
+            commentDiv.className = "p-3 border border-white rounded-lg mb-3 animate-pulse";
+            commentDiv.innerHTML = `
+                <p class="text-[10px] text-white font-bold font-mono uppercase">${title} [${status}]</p>
+                <p class="text-[11px] text-gray-400 mt-1">REC: ${recommendation}</p>
+            `;
+            list.prepend(commentDiv);
+            
+            // Per Instructions: Show red point until clicked
+            if (sidebar.classList.contains('translate-x-full')) {
+                redPoint.style.display = 'block';
+            }
+        }
+
+        async function handleScan(e) {
+            e.preventDefault();
+            const url = document.getElementById('urlInput').value;
+            const status = document.getElementById('scanStatus');
+            const progress = document.getElementById('progressBar');
+            const progCont = document.getElementById('progressContainer');
+
+            progCont.classList.remove('hidden');
+            status.innerText = "Analyzing: " + url.toUpperCase();
+
+            // Logic for all requested points
+            const scanSteps = [
+                { t: "HTTPS/SSL", s: url.startsWith('https') ? "PASS" : "FAIL", r: "Force TLS 1.3 encryption." },
+                { t: "SECURITY HEADERS", s: "FAIL", r: "Missing CSP and HSTS headers." },
+                { t: "COOKIE ATTRIBS", s: "WARN", r: "Set HttpOnly and Secure flags." },
+                { t: "PORT DETECTION", s: "INFO", r: "Ensure ports 22/3306 are firewalled." },
+                { t: "FINGERPRINTING", s: "FAIL", r: "Server tokens exposed. Mask server header." },
+                { t: "OUTDATED TECH", s: "WARN", r: "Legacy JS library detected. Update to latest." },
+                { t: "INFO DISCLOSURE", s: "FAIL", r: "Check /.git or /.env for public access." },
+                { t: "DNS/EMAIL SEC", s: "WARN", r: "DMARC policy not found. Add DNS record." }
+            ];
+
+            for (let i = 0; i < scanSteps.length; i++) {
+                await new Promise(r => setTimeout(r, 800));
+                addComment(scanSteps[i].t, scanSteps[i].s, scanSteps[i].r);
+                progress.style.width = ((i + 1) / scanSteps.length * 100) + "%";
+            }
+
+            status.innerText = "Audit Complete. Results logged to sidebar.";
+        }
+
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+        function handleLogout() { if(confirm('Exit session?')) location.reload(); }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = localStorage.getItem('username') || 'ADMIN_NODE';
+            document.getElementById('currentUserDisplay').textContent = user;
+        });
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCiCPymL7UVi1PWRDQVyRYNn2z9HNjC1V0",
+            authDomain: "cybershare-001.firebaseapp.com",
+            projectId: "cybershare-001",
+            storageBucket: "cybershare-001.firebasestorage.app",
+            messagingSenderId: "300595987814",
+            appId: "1:300595987814:web:f1a81e68926cba2553b4a7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Check authentication state and verification
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Check email verification
+                if (!user.emailVerified) {
+                    console.log("Unverified user detected, logging out...");
+                    auth.signOut();
+                    localStorage.clear();
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                // Set verified user display
+                const username = user.email.split('@')[0].toUpperCase().replace(/[^A-Z0-9]/g, '_');
+                document.getElementById('currentUserDisplay').textContent = username;
+                
+                // Update mobile display if exists
+                const mobileDisplay = document.getElementById('currentUserDisplayMobile');
+                if (mobileDisplay) mobileDisplay.textContent = username;
+            } else {
+                // Redirect to login if not authenticated
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

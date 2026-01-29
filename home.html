@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShare - Community Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cyber-dark': '#0A0E1A',
+                        'cyber-darker': '#060911',
+                        'cyber-blue': '#00D9FF',
+                        'cyber-purple': '#8B5CF6',
+                    },
+                    fontFamily: { 'mono': ['JetBrains Mono', 'monospace'], 'sans': ['Sora', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-text { background: linear-gradient(135deg, #00D9FF 0%, #8B5CF6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #060911; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1F2937; border-radius: 3px; }
+        #messageSidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar-closed { transform: translateX(100%); }
+        .verified-glow { text-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+        .scanline { width: 100%; height: 2px; background: rgba(0, 217, 255, 0.1); position: absolute; animation: scan 4s linear infinite; }
+        @keyframes scan { from { top: 0; } to { top: 100%; } }
+        @keyframes pulse-glow { 
+            0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.8); }
+            50% { box-shadow: 0 0 20px rgba(239, 68, 68, 1); }
+        }
+        body { background-color: #060911; }
+        .notif-badge {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="text-gray-100 h-screen font-sans w-screen custom-scrollbar overflow-x-hidden">
+
+    <nav class="bg-[#0A0B0D] backdrop-blur-xl border-b border-white/5 sticky top-0 z-50">
+        <div class="max-w-[1800px] mx-auto px-6">
+            <!-- Desktop Navigation -->
+            <div class="hidden xl:flex items-center justify-between h-20">
+                <div class="flex items-center space-x-8">
+                    <div class="flex flex-col border-r border-white/10 pr-8">
+                        <span class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">User</span>
+                        <span id="currentUserDisplay" class="text-gray-500 font-semibold text-sm uppercase">THIS_USER</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-white to-black rounded flex items-center justify-center shadow-[0_0_4px_white]">
+                            <span class="text-white font-bold text-xs">CS</span>
+                        </div>
+                        <span class="font-bold text-xl font-mono tracking-tighter uppercase">Cyber<span class="text-white">Share</span></span>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-8 items-center">
+                    <a href="#" class="text-white font-mono text-[12px] transition tracking-widest uppercase">HOME</a>
+                    <a href="scanner.html" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase">SCANNER</a>
+                    <a href="resources.html" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase">RESOURCES</a>
+                    <button onclick="toggleModal('protocolModal')" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase">Protocol</button>
+                    <div class="h-6 w-[1px] bg-white/10 mx-2"></div>
+                    
+                    <button id="sidebarToggleBtn" onclick="toggleSidebar()" class="relative p-2 bg-white/5 border border-white/10 rounded-lg group transition-all hover:bg-white/10">
+                        <svg class="w-5 h-5 text-white fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                        </svg>
+                        <div id="notif-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full border-2 border-cyber-dark notif-badge"></div>
+                        <div id="notif-count" class="hidden absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-cyber-dark">0</div>
+                    </button>
+
+                    <button onclick="handleLogout()" class="px-4 py-2 bg-black border-2 border-white text-white hover:bg-gray-800 rounded-lg text-[10px] transition uppercase">Logout</button>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation -->
+            <div class="xl:hidden">
+                <!-- Mobile Header -->
+                <div class="flex items-center justify-between h-20">
+                    <div class="flex items-center space-x-4">
+                        <div class="hidden sm:flex flex-col">
+                            <span class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">User</span>
+                            <span id="currentUserDisplay" class="text-gray-500 font-semibold text-sm uppercase">THIS_USER</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-6 h-6 bg-gradient-to-br from-white to-black rounded flex items-center justify-center shadow-[0_0_4px_white]">
+                                <span class="text-white font-bold text-[8px]">CS</span>
+                            </div>
+                            <span class="font-bold text-lg font-mono tracking-tighter uppercase">Cyber<span class="text-white">Share</span></span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="toggleMobileMenu()" class="p-2 bg-white/5 border border-white/10 rounded-lg group transition-all hover:bg-white/10">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu (Vertical) -->
+                <div id="mobileMenu" class="hidden pb-4 space-y-3">
+                    <div class="flex flex-col space-y-2">
+                        <a href="#" class="text-white font-mono text-[12px] transition tracking-widest uppercase py-2 px-4 hover:bg-white/10 rounded">HOME</a>
+                        <a href="scanner.html" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase py-2 px-4 hover:bg-white/10 rounded">SCANNER</a>
+                        <a href="resources.html" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase py-2 px-4 hover:bg-white/10 rounded">RESOURCES</a>
+                        <button onclick="toggleModal('protocolModal')" class="text-gray-400 hover:text-white font-mono text-[12px] transition tracking-widest uppercase py-2 px-4 hover:bg-white/10 rounded text-left">PROTOCOL</button>
+                    </div>
+                    
+                    <div class="border-t border-white/10 pt-3 flex items-center justify-between">
+                        <button id="sidebarToggleBtn" onclick="toggleSidebar()" class="relative p-2 bg-white/5 border border-white/10 rounded-lg group transition-all hover:bg-white/10">
+                            <svg class="w-5 h-5 text-white fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                            </svg>
+                            <div id="notif-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full border-2 border-cyber-dark notif-badge"></div>
+                            <div id="notif-count" class="hidden absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-cyber-dark">0</div>
+                        </button>
+
+                        <button onclick="handleLogout()" class="px-4 py-2 bg-black border-2 border-white text-white hover:bg-gray-800 rounded-lg text-[10px] transition uppercase">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="bg-black max-w-[1800px] mx-auto px-6 py-10">
+        <div class="flex flex-col lg:flex-row gap-10">
+            
+            <div class="lg:w-3/4 space-y-8">
+                
+                <div class="bg-black border border-white/10 p-6 rounded-2xl shadow-xl relative overflow-hidden">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
+                        <h3 class="text-xs font-bold uppercase tracking-widest">Create a new post</h3>
+                    </div>
+                    <textarea id="newPostContent" placeholder="Hi, there!" class="w-full text-black border bg-white border-white/5 rounded-xl p-4 text-md focus:outline-none focus:border-white transition-all resize-none h-24 mb-4"></textarea>
+                    <div class="flex justify-end">
+                        <button id="broadcastBtn" class="px-6 py-2 bg-black text-white font-bold font-mono text-xs rounded-lg hover:bg-white hover:text-black border-2 border-transparent border-white text-white transition-all uppercase tracking-tighter">Submit</button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row items-start md:items-end justify-between border-b border-white/10 pb-6 gap-4">
+                    <div>
+                        <h1 class="text-5xl font-semibold text-transparent bg-clip-text bg-gradient-to-br from-white to-black tracking-tighter lowercase">Global Feed</h1>
+                        <p class="text-gray-500 text-sm mt-2">STREAMING LATEST UPLINKS ...</p>
+                    </div>
+                </div>
+
+                <div id="timeline" class="grid grid-cols-1 gap-6">
+                    <div class="text-center py-20 text-gray-600 animate-pulse tracking-[0.5em]">INITIALIZING FEED...</div>
+                </div>
+            </div>
+
+            <div class="lg:w-1/4 space-y-6">
+                <div class="bg-black border-2 border-white p-6 rounded-2xl sticky top-28">
+                    <h3 class="font-mono font-bold text-white mb-6 flex items-center gap-2 uppercase tracking-widest text-xs">
+                        <span class="w-2 h-2 bg-white rounded-full"></span> System_Resources
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-cyber-darker rounded-lg border border-white/5">
+                            <p class="text-[10px] text-gray-500 lowercase">FEED CAPACITY</p>
+                            <p class="text-white" id="postCount">0/60 Posts</p>
+                        </div>
+                        <div class="p-4 bg-cyber-darker rounded-lg border border-white/5">
+                            <p class="text-[10px] text-gray-500 lowercase">ACTUAL STATUS</p>
+                            <p class="text-white font-mono">ONLINE</p>
+                        </div>
+                        <div class="p-4 bg-cyber-darker rounded-lg border border-white/5">
+                            <p class="text-[10px] text-gray-500 lowecase">Current User</p>
+                            <p class="text-white text-sm" id="sidebarUsername">LOADING...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <aside id="messageSidebar" class="fixed top-0 right-0 h-full w-96 bg-[#0A0B0D] border-l border-white/10 z-[60] sidebar-closed flex flex-col shadow-2xl">
+        <div class="p-8 border-b border-white/5 flex justify-between items-center bg-black">
+            <h2 class="font-bold font-mono text-white uppercase text-sm tracking-widest">My_Comments_Thread</h2>
+            <button onclick="toggleSidebar()" class="text-gray-500 hover:text-white transition text-3xl font-light">&times;</button>
+        </div>
+        <div id="commenterList" class="bg-black flex-1 overflow-y-auto custom-scrollbar p-6 space-y-4">
+            <div class="text-center py-10 text-white text-xs lowercase tracking-tighter opacity-50">Empty_Buffer</div>
+        </div>
+    </aside>
+
+    <div id="protocolModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-cyber-darker/90 backdrop-blur-md" onclick="toggleModal('protocolModal')"></div>
+        <div class="bg-[#0A0B0D] border-2  border-white w-full max-w-md rounded-xl p-8 relative shadow-2xl">
+            <h2 class="font-bold text-white mb-6 text-xl tracking-tighter lowercase">System Protocols</h2>
+            <ul class="space-y-4 font-mono text-xs text-gray-400">
+                <li><span class="text-white">[01]</span> NO_SPAM: Excessive broadcasting throttles your node.</li>
+                <li><span class="text-white">[02]</span> INTEGRITY: Hostile code is automatically scrubbed.</li>
+                <li><span class="text-white">[03]</span> UPLINK: Posts are persistent and visible to all nodes.</li>
+                <li><span class="text-white">[04]</span> COMMS: All replies are transmitted in real-time.</li>
+            </ul>
+            <button onclick="toggleModal('protocolModal')" class="mt-8 w-full py-3 border border-white text-white hover:bg-gray-800 transition-all text-[14px] lowercase tracking-tighter">Acknowledge</button>
+        </div>
+    </div>
+
+    <div id="commentModal" class="hidden fixed inset-0 z-[80] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black backdrop-blur-md" onclick="closeCommentModal()"></div>
+        <div class="bg-[#0A0B0D] border border-white/10 w-full max-w-2xl rounded-2xl overflow-hidden relative shadow-[0_0_5px_white]">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                <div>
+                    <h3 id="commentTargetName" class="text-white lowercase text-md">Reply here</h3>
+                    <p id="commentCount" class="text-[10px] text-gray-500 mt-1">0 MESSAGES</p>
+                </div>
+                <button onclick="closeCommentModal()" class="text-gray-500 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div id="chatHistory" class="h-80 overflow-y-auto p-6 space-y-4 bg-black custom-scrollbar">
+                <p class="text-white text-center py-10 text-xs lowercase">Loading_Comms...</p>
+            </div> 
+            <div class="p-6 bg-black border-t border-white/10">
+                <textarea id="commentText" placeholder="TYPE_MESSAGE..." class="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:outline-none focus:border-white h-24 mb-4 resize-none font-mono text-sm"></textarea>
+                <button id="submitReplyBtn" class="w-full bg-black text-white border-2 border-white py-4 rounded-lg font-bold hover:bg-gray-500 transition-all lowercase text-xs">Reply</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCiCPymL7UVi1PWRDQVyRYNn2z9HNjC1V0",
+            authDomain: "cybershare-001.firebaseapp.com",
+            projectId: "cybershare-001",
+            storageBucket: "cybershare-001.firebasestorage.app",
+            messagingSenderId: "300595987814",
+            appId: "1:300595987814:web:f1a81e68926cba2553b4a7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // State
+        let isVerified = localStorage.getItem('isVerified') === 'true';
+        let currentUser = localStorage.getItem('username') || "NEON_WRAITH";
+        let currentUserEmail = localStorage.getItem('userEmail') || "";
+        let activePostId = null;
+        let commentListeners = new Map();
+        let unreadComments = 0;
+
+        // Check authentication state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Check email verification
+                if (!user.emailVerified) {
+                    console.log("Unverified user detected, logging out...");
+                    auth.signOut();
+                    localStorage.clear();
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                currentUserEmail = user.email;
+                currentUser = user.email.split('@')[0].toUpperCase().replace(/[^A-Z0-9]/g, '_');
+                localStorage.setItem('username', currentUser);
+                localStorage.setItem('userEmail', currentUserEmail);
+                document.getElementById('currentUserDisplay').innerText = currentUser;
+                document.getElementById('sidebarUsername').innerText = currentUser;
+                
+                // Initialize notification listener for this user
+                initializeNotificationListener();
+            } else {
+                // Redirect to login if not authenticated
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Initialize notification listener for unread comments
+        function initializeNotificationListener() {
+            const notifRef = doc(db, 'notifications', currentUserEmail);
+            
+            onSnapshot(notifRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    unreadComments = data.unreadComments || 0;
+                    
+                    if (unreadComments > 0) {
+                        document.getElementById('notif-dot').classList.remove('hidden');
+                        document.getElementById('notif-count').classList.remove('hidden');
+                        document.getElementById('notif-count').textContent = unreadComments;
+                    } else {
+                        document.getElementById('notif-dot').classList.add('hidden');
+                        document.getElementById('notif-count').classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        // 1. LIVE FEED LISTENER
+        const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const posts = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                posts.push({ 
+                    id: doc.id, 
+                    ...data,
+                    commentCount: data.commentCount || 0
+                });
+            });
+            renderTimeline(posts);
+        });
+
+        function renderTimeline(posts) {
+            const tl = document.getElementById('timeline');
+            document.getElementById('postCount').innerText = `${posts.length}/60 Units`;
+            
+            if(posts.length === 0) {
+                tl.innerHTML = `<div class="text-center py-20 font-mono text-gray-700 uppercase">No_Signal_Detected</div>`;
+                return;
+            }
+
+            tl.innerHTML = posts.map(u => {
+                const commentBadge = u.commentCount > 0 
+                    ? `<span class="ml-2 px-2 py-0.5 bg-black text-white rounded-full text-[9px] font-bold">${u.commentCount}</span>` 
+                    : '';
+                
+                return `
+                <div class="bg-black border border-white/5 p-8 rounded-2xl hover:border-white/10 transition-all group">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-center gap-5">
+                            <div class="w-12 h-12 bg-[#0A0B0D] border border-white/10 rounded-xl flex items-center justify-center font-mono text-white text-lg font-bold">${u.name.charAt(0)}</div>
+                            <div>
+                                <h4 class="text-lg font-bold font-mono text-white tracking-tighter">@${u.name}</h4>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] font-mono text-gray-600 mb-2">${u.time || 'NOW'}</p>
+                            <button onclick="window.triggerReply('${u.id}', '${u.name}', '${u.authorEmail || ''}')" class="px-4 py-1.5 border border-white/10 hover:border-white text-white font-mono text-[10px] rounded uppercase transition-all flex items-center gap-2">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                </svg>
+                                Open_Comms${commentBadge}
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-md leading-relaxed font-sans border-l-2 border-white/5 pl-4">${u.post}</p>
+                </div>
+            `}).join('');
+        }
+
+        // 2. BROADCAST POST
+        document.getElementById('broadcastBtn').onclick = async () => {
+            const content = document.getElementById('newPostContent').value;
+            if(!content.trim()) {
+                alert("ERROR: Message cannot be empty");
+                return;
+            }
+
+            const btn = document.getElementById('broadcastBtn');
+            btn.disabled = true;
+            btn.innerText = "TRANSMITTING...";
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            try {
+                console.log("Attempting to write to Firestore...");
+                
+                await addDoc(collection(db, "posts"), {
+                    name: currentUser,
+                    authorEmail: currentUserEmail,
+                    post: content,
+                    verified: isVerified,
+                    timestamp: serverTimestamp(),
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    commentCount: 0
+                });
+                
+                document.getElementById('newPostContent').value = '';
+                console.log("✓ Transmission Successful");
+                
+                btn.innerText = "SUCCESS!";
+                btn.classList.remove('bg-cyber-blue');
+                btn.classList.add('bg-green-500');
+                
+                setTimeout(() => {
+                    btn.innerText = "EXECUTE_BROADCAST";
+                    btn.classList.remove('bg-green-500');
+                    btn.classList.add('bg-cyber-blue');
+                }, 2000);
+                
+            } catch (e) {
+                console.error("❌ Transmission Failed:", e);
+                console.error("Error code:", e.code);
+                console.error("Error message:", e.message);
+                
+                let errorMsg = "CRITICAL_FAILURE: ";
+                if (e.code === 'permission-denied') {
+                    errorMsg += "Firestore rules blocking write. Check Firebase Console → Firestore → Rules";
+                } else if (e.code === 'unavailable') {
+                    errorMsg += "Network issue or Firestore not enabled";
+                } else {
+                    errorMsg += e.message;
+                }
+                
+                alert(errorMsg);
+                
+                btn.innerText = "FAILED - RETRY";
+                btn.classList.remove('bg-[#0A0B0D]');
+                btn.classList.add('bg-red-500');
+                
+                setTimeout(() => {
+                    btn.innerText = "EXECUTE_BROADCAST";
+                    btn.classList.remove('bg-red-500');
+                    btn.classList.add('bg-cyber-blue');
+                }, 3000);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        };
+
+        // 3. REPLY & NOTIFICATION LOGIC - IMPROVED
+        window.triggerReply = async (postId, authorName, authorEmail) => {
+            activePostId = postId;
+            document.getElementById('commentTargetName').innerText = `REPLY_TO: @${authorName}`;
+            
+            // Clean up previous listener if exists
+            if (commentListeners.has(postId)) {
+                commentListeners.get(postId)();
+            }
+            
+            // Fetch comments for this specific post with real-time listener
+            const cq = query(collection(db, `posts/${postId}/comments`), orderBy("timestamp", "asc"));
+            const unsubscribe = onSnapshot(cq, (snap) => {
+                const history = document.getElementById('chatHistory');
+                const commentCountEl = document.getElementById('commentCount');
+                
+                commentCountEl.innerText = `${snap.size} MESSAGE${snap.size !== 1 ? 'S' : ''}`;
+                
+                if (snap.empty) {
+                    history.innerHTML = '<p class="text-gray-600 font-mono text-center py-10 text-xs uppercase">No_Comms_History</p>';
+                    return;
+                }
+                
+                let html = "";
+                snap.forEach(doc => {
+                    const c = doc.data();
+                    const isOwn = c.userEmail === currentUserEmail;
+                    const alignClass = isOwn ? 'ml-auto' : 'mr-auto';
+                    const bgClass = isOwn ? 'bg-cyber-blue/10 border-cyber-blue/30' : 'bg-white/5 border-white/5';
+                    
+                    html += `
+                        <div class="max-w-[80%] ${alignClass}">
+                            <div class="${bgClass} p-4 rounded-lg border">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-cyber-blue font-mono text-[10px] font-bold">@${c.user}</span>
+                                    <span class="text-[9px] text-gray-600 font-mono">${c.time}</span>
+                                </div>
+                                <p class="text-gray-300 text-sm font-sans">${c.text}</p>
+                            </div>
+                        </div>`;
+                });
+                history.innerHTML = html;
+                
+                // Scroll to bottom
+                history.scrollTop = history.scrollHeight;
+            });
+            
+            commentListeners.set(postId, unsubscribe);
+            toggleModal('commentModal');
+        };
+
+        // Submit Reply with Notification
+        document.getElementById('submitReplyBtn').onclick = async () => {
+            const text = document.getElementById('commentText').value;
+            if(!text.trim() || !activePostId) {
+                alert("ERROR: Message cannot be empty");
+                return;
+            }
+
+            const btn = document.getElementById('submitReplyBtn');
+            btn.disabled = true;
+            btn.innerText = "SENDING...";
+
+            try {
+                // Get post data to find author
+                const postRef = doc(db, 'posts', activePostId);
+                const postSnap = await getDoc(postRef);
+                const postData = postSnap.data();
+                
+                // Add comment to Firestore
+                await addDoc(collection(db, `posts/${activePostId}/comments`), {
+                    user: currentUser,
+                    userEmail: currentUserEmail,
+                    text: text,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    timestamp: serverTimestamp()
+                });
+
+                // Update comment count on post
+                await updateDoc(postRef, {
+                    commentCount: increment(1)
+                });
+
+                // Create notification for post author (if not commenting on own post)
+                if (postData.authorEmail && postData.authorEmail !== currentUserEmail) {
+                    const notifRef = doc(db, 'notifications', postData.authorEmail);
+                    const notifSnap = await getDoc(notifRef);
+                    
+                    if (notifSnap.exists()) {
+                        await updateDoc(notifRef, {
+                            unreadComments: increment(1)
+                        });
+                    } else {
+                        await setDoc(notifRef, {
+                            unreadComments: 1
+                        });
+                    }
+                }
+
+                // Add to sidebar
+                const entry = document.createElement('div');
+                entry.className = "p-4 bg-cyber-darker border border-white/10 rounded-lg border-l-2 border-l-cyber-blue";
+                entry.innerHTML = `
+                    <span class="text-[9px] text-cyber-blue font-mono uppercase">Outgoing_Reply</span>
+                    <p class="text-xs text-gray-300 font-sans mt-1 line-clamp-2">${text}</p>
+                    <p class="text-[8px] text-gray-600 font-mono mt-1">${new Date().toLocaleTimeString()}</p>
+                `;
+                
+                const listContainer = document.getElementById('commenterList');
+                if (listContainer.children[0]?.classList.contains('opacity-50')) {
+                    listContainer.innerHTML = '';
+                }
+                listContainer.prepend(entry);
+
+                document.getElementById('commentText').value = '';
+                console.log("✓ Comment sent successfully");
+                
+                btn.innerText = "SENT!";
+                setTimeout(() => {
+                    btn.innerText = "TRANSMIT_REPLY";
+                }, 1500);
+                
+            } catch (e) {
+                console.error("❌ Comment Failed:", e);
+                alert("TRANSMISSION_ERROR: " + e.message);
+                btn.innerText = "FAILED - RETRY";
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        // Clear notifications when sidebar is opened
+        window.originalToggleSidebar = window.toggleSidebar;
+        window.toggleSidebar = async () => {
+            const sidebar = document.getElementById('messageSidebar');
+            const wasClosed = sidebar.classList.contains('sidebar-closed');
+            
+            window.originalToggleSidebar();
+            
+            // Clear notifications when opening sidebar
+            if (wasClosed && unreadComments > 0) {
+                try {
+                    const notifRef = doc(db, 'notifications', currentUserEmail);
+                    await updateDoc(notifRef, {
+                        unreadComments: 0
+                    });
+                } catch (e) {
+                    console.log("No notifications to clear");
+                }
+            }
+        };
+
+        // VERIFICATION
+        document.getElementById('verifyBtn').onclick = () => {
+            localStorage.setItem('isVerified', 'true');
+            isVerified = true;
+            const banner = document.getElementById('verif-banner');
+            banner.innerHTML = `<span class="text-green-400 text-[10px] font-mono verified-glow uppercase tracking-widest">● Identity_Verified_Node</span>`;
+            banner.className = "bg-green-500/5 border border-green-500/20 p-4 rounded-xl";
+        };
+
+        // INIT UI
+        document.getElementById('currentUserDisplay').innerText = currentUser;
+        document.getElementById('sidebarUsername').innerText = currentUser;
+        if(isVerified) {
+            const banner = document.getElementById('verif-banner');
+            banner.innerHTML = `<span class="text-green-400 text-[10px] font-mono verified-glow uppercase tracking-widest">● Identity_Verified_Node</span>`;
+            banner.className = "bg-green-500/5 border border-green-500/20 p-4 rounded-xl";
+        }
+
+        // Logout function
+        window.handleLogout = async () => {
+            try {
+                await auth.signOut();
+                localStorage.clear();
+                window.location.href = 'index.html';
+            } catch (e) {
+                console.error("Logout failed:", e);
+            }
+        };
+    </script>
+
+    <script>
+        // GLOBAL UI HELPERS
+        function toggleSidebar() { 
+            const sidebar = document.getElementById('messageSidebar');
+            sidebar.classList.toggle('sidebar-closed'); 
+        }
+        
+        function toggleModal(id) { 
+            document.getElementById(id).classList.toggle('hidden'); 
+        }
+
+        function closeCommentModal() {
+            toggleModal('commentModal');
+            // Clear the comment input
+            document.getElementById('commentText').value = '';
+        }
+
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
