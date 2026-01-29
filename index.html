@@ -231,6 +231,9 @@
                 <input type="password" id="loginPassword" placeholder="Password" required>
                 <button type="submit" class="btn btn-signup" style="width: 100%">Enter System</button>
                 <p id="loginMsg" class="auth-msg"></p>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <a href="#" onclick="openForgotPassword()" style="color: var(--primary); font-size: 0.85rem; text-decoration: none;">Forgot Password?</a>
+                </div>
             </form>
         </div>
     </div>
@@ -248,9 +251,51 @@
         </div>
     </div>
 
+    <div id="forgotPasswordModal" class="modal-overlay">
+        <div class="absolute inset-0 bg-cyber-darker/90 backdrop-blur-md" onclick="toggleModal('forgotPasswordModal')"></div>
+        <div class="bg-[#0A0B0D] border-2 border-white w-full max-w-md rounded-xl p-8 relative shadow-2xl">
+            <h2 class="font-bold text-white mb-6 text-xl tracking-tighter lowercase">Reset Password</h2>
+            
+            <div class="mb-6 p-4 bg-black/50 border border-white/10 rounded-lg">
+                <p class="text-gray-400 text-sm mb-2">
+                    <strong>📧 How it works:</strong>
+                </p>
+                <ol class="text-gray-500 text-xs space-y-1 list-decimal list-inside">
+                    <li>Enter your email address below</li>
+                    <li>Check your inbox for reset link</li>
+                    <li>Click the link to create new password</li>
+                    <li>Link expires in 1 hour for security</li>
+                </ol>
+            </div>
+            
+            <form id="forgotPasswordForm">
+                <div class="mb-4">
+                    <label class="block text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Email Address</label>
+                    <input type="email" id="resetEmail" placeholder="Enter your email address" class="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:outline-none focus:border-white font-mono text-sm" required>
+                    <p class="text-gray-600 text-xs mt-1">We'll send a reset link to this address</p>
+                </div>
+                
+                <button type="submit" class="w-full py-3 bg-cyber-blue text-white hover:bg-cyber-blue/80 transition-all text-[14px] lowercase tracking-tighter disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Send Reset Link
+                </button>
+                
+                <p id="resetMsg" class="auth-msg text-center mt-4 text-sm"></p>
+                
+                <div class="mt-6 pt-4 border-t border-white/10 space-y-2">
+                    <div style="text-align: center;">
+                        <a href="#" onclick="toggleModal('loginModal'); toggleModal('forgotPasswordModal');" class="text-cyber-blue hover:text-cyber-blue/80 text-sm transition-colors">← Back to Login</a>
+                    </div>
+                    <div style="text-align: center;">
+                        <a href="#" onclick="toggleModal('signupModal'); toggleModal('forgotPasswordModal');" class="text-gray-400 hover:text-white text-sm transition-colors">Don't have an account? Sign up</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCiCPymL7UVi1PWRDQVyRYNn2z9HNjC1V0",
@@ -367,7 +412,134 @@
                 displayMsg("loginMsg", "Failed to resend verification email.", true);
             }
         };
-    </script>
+
+        // Forgot password function - Enhanced for forgotten passwords
+        document.getElementById('forgotPasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('resetEmail').value.trim();
+
+            // Enhanced email validation
+            if (!email || !isValidEmail(email)) {
+                displayMsg("resetMsg", 
+                    "❌ Invalid email address<br><small>Please enter a valid email (e.g., user@example.com)</small>", 
+                    true
+                );
+                return;
+            }
+
+            // Disable button and show loading state
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerText;
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Sending...";
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            displayMsg("resetMsg", 
+                "📧 Sending password reset link...<br><small>Please wait while we process your request</small>", 
+                false
+            );
+
+            try {
+                // Send password reset email via Firebase
+                await sendPasswordResetEmail(auth, email);
+                
+                // Success message with comprehensive instructions
+                displayMsg("resetMsg", 
+                    "✅ Password reset link sent successfully!<br><small>" +
+                    "📬 Check your email inbox (and spam folder)<br>" +
+                    "⏰ Link expires in 1 hour for security<br>" +
+                    "🔗 Click the link to create your new password</small>", 
+                    false
+                );
+                
+                // Store email for potential follow-up
+                sessionStorage.setItem('resetEmail', email);
+                
+                // Clear form
+                document.getElementById('resetEmail').value = '';
+                
+                // Update button to success state
+                submitBtn.innerText = "✓ Email Sent";
+                submitBtn.classList.remove('opacity-50');
+                submitBtn.classList.add('bg-green-600');
+                
+                // Auto-close modal after 5 seconds for better user experience
+                setTimeout(() => {
+                    toggleModal('forgotPasswordModal');
+                    toggleModal('loginModal');
+                    
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
+                    submitBtn.classList.remove('bg-green-600');
+                    
+                    // Clear session storage
+                    sessionStorage.removeItem('resetEmail');
+                }, 5000);
+                
+            } catch (error) {
+                console.error("Password reset error:", error);
+                
+                let errorMessage = "Failed to send reset link.";
+                let helpText = "";
+                let troubleshooting = "";
+                
+                // Enhanced error handling
+                if (error.code === 'auth/user-not-found') {
+                    errorMessage = "❌ No account found with this email";
+                    helpText = "<small>Double-check the email address or create a new account</small>";
+                    troubleshooting = "<small>Make sure you're using the email you registered with</small>";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = "❌ Invalid email address format";
+                    helpText = "<small>Please enter a valid email address (e.g., user@example.com)</small>";
+                    troubleshooting = "<small>Email should contain @ and a domain name</small>";
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMessage = "Too many reset attempts";
+                    helpText = "<small>Please wait a few minutes before trying again</small>";
+                    troubleshooting = "<small>For immediate help, contact support</small>";
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorMessage = "🌐 Network connection error";
+                    helpText = "<small>Check your internet connection and try again</small>";
+                    troubleshooting = "<small>Try refreshing the page or switching networks</small>";
+                } else {
+                    errorMessage = "⚠️ An unexpected error occurred";
+                    helpText = "<small>Please try again or contact support if the problem persists</small>";
+                    troubleshooting = "<small> Error code: " + (error.code || 'UNKNOWN') + "</small>";
+                }
+                
+                displayMsg("resetMsg", 
+                    errorMessage + "<br>" + helpText + "<br>" + troubleshooting, 
+                    true
+                );
+                
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        });
+
+        // Email validation helper function
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email) && email.length > 5 && email.length < 100;
+        }
+
+        // Add email validation on input
+        document.getElementById('resetEmail').addEventListener('input', (e) => {
+            const email = e.target.value.trim();
+            const submitBtn = e.target.form.querySelector('button[type="submit"]');
+            
+            if (email && isValidEmail(email)) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50');
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50');
+            }
+        });
+
+            </script>
 
     <script>
         function toggleModal(id) {
@@ -376,6 +548,25 @@
             if(msg) msg.innerText = "";
             modal.classList.toggle('modal-active');
         }
+        
+        // Open forgot password modal with pre-filled email
+        window.openForgotPassword = () => {
+            // Get email from login form
+            const loginEmail = document.getElementById('loginEmail').value.trim();
+            
+            // Switch modals
+            toggleModal('loginModal');
+            toggleModal('forgotPasswordModal');
+            
+            // Pre-fill email if available
+            if (loginEmail) {
+                document.getElementById('resetEmail').value = loginEmail;
+                
+                // Trigger validation to enable button
+                const event = new Event('input');
+                document.getElementById('resetEmail').dispatchEvent(event);
+            }
+        };
         
         window.onclick = function(event) {
             if (event.target.className === 'modal-overlay modal-active') {

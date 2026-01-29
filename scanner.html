@@ -65,7 +65,7 @@
         <div class="max-w-[1800px] mx-auto px-6">
             <div class="hidden xl:flex items-center justify-between h-20">
                 <div class="flex items-center space-x-8">
-                    <div class="flex flex-col border-r border-white/10 pr-8">
+                    <div class="flex flex-col border-r border-white/10 pr-8 cursor-pointer hover:bg-white/5 px-2 py-1 rounded transition-all" onclick="toggleUserModal()">
                         <span class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">User</span>
                         <span id="currentUserDisplay" class="text-gray-500 font-semibold text-sm uppercase">THIS_USER</span>
                     </div>
@@ -100,7 +100,7 @@
                 <!-- Mobile Header -->
                 <div class="flex items-center justify-between h-20">
                     <div class="flex items-center space-x-4">
-                        <div class="hidden sm:flex flex-col">
+                        <div class="hidden sm:flex flex-col cursor-pointer hover:bg-white/5 px-2 py-1 rounded transition-all" onclick="toggleUserModal()">
                             <span class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">User</span>
                             <span id="currentUserDisplay" class="text-gray-500 font-semibold text-sm uppercase">THIS_USER</span>
                         </div>
@@ -203,6 +203,52 @@
         </div>
     </div>
 
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="toggleLogoutModal()"></div>
+        <div class="bg-black border-2 border-white w-full max-w-md rounded-xl p-8 relative shadow-2xl">
+            <h2 class="font-bold text-white mb-6 text-xl tracking-tighter lowercase">Confirm Logout</h2>
+            <p class="text-gray-400 mb-8 text-sm">Are you sure you want to leave the session? You will need to login again to access the platform.</p>
+            <div class="flex gap-4">
+                <button onclick="toggleLogoutModal()" class="flex-1 py-3 border border-white text-white hover:bg-gray-800 transition-all text-[14px] lowercase tracking-tighter">Cancel</button>
+                <button onclick="confirmLogout()" class="flex-1 py-3 bg-red-600 text-white hover:bg-red-700 transition-all text-[14px] lowercase tracking-tighter">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Information Modal -->
+    <div id="userModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="toggleUserModal()"></div>
+        <div class="bg-black border-2 border-white w-full max-w-md rounded-xl p-8 relative shadow-2xl">
+            <h2 class="font-bold text-white mb-6 text-xl tracking-tighter lowercase">User Information</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Display Name</label>
+                    <input type="text" id="displayName" class="w-full bg-black border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-white font-mono text-sm" placeholder="Enter display name">
+                </div>
+                
+                <div>
+                    <label class="block text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Email Address</label>
+                    <input type="email" id="userEmail" class="w-full bg-black border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-white font-mono text-sm" readonly>
+                </div>
+                
+                <div>
+                    <label class="block text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Account Status</label>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="text-green-500 font-mono text-sm">● VERIFIED_NODE</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 mt-8">
+                <button onclick="toggleUserModal()" class="flex-1 py-3 border border-white text-white hover:bg-gray-800 transition-all text-[14px] lowercase tracking-tighter">Cancel</button>
+                <button onclick="updateUserInfo()" class="flex-1 py-3 bg-cyber-blue text-white hover:bg-cyber-blue/80 transition-all text-[14px] lowercase tracking-tighter">Update</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function toggleButton() {
             const check = document.getElementById('ackCheck');
@@ -277,7 +323,94 @@
         }
 
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
-        function handleLogout() { if(confirm('Exit session?')) location.reload(); }
+        
+        function handleLogout() {
+            toggleLogoutModal();
+        }
+
+        function toggleLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            modal.classList.toggle('hidden');
+        }
+
+        async function confirmLogout() {
+            try {
+                // Firebase auth logout
+                const auth = getAuth(initializeApp({
+                    apiKey: "AIzaSyCiCPymL7UVi1PWRDQVyRYNn2z9HNjC1V0",
+                    authDomain: "cybershare-001.firebaseapp.com",
+                    projectId: "cybershare-001",
+                    storageBucket: "cybershare-001.firebasestorage.app",
+                    messagingSenderId: "300595987814",
+                    appId: "1:300595987814:web:f1a81e68926cba2553b4a7"
+                }));
+                await auth.signOut();
+                localStorage.clear();
+                window.location.href = 'index.html';
+            } catch (e) {
+                console.error("Logout failed:", e);
+                alert("Logout failed. Please try again.");
+            }
+        }
+
+        // User modal functions
+        function toggleUserModal() {
+            const modal = document.getElementById('userModal');
+            modal.classList.toggle('hidden');
+            
+            // Populate user info when opening modal
+            if (!modal.classList.contains('hidden')) {
+                const username = localStorage.getItem('username') || 'ADMIN_NODE';
+                const userEmail = localStorage.getItem('userEmail') || '';
+                document.getElementById('displayName').value = username;
+                document.getElementById('userEmail').value = userEmail;
+            }
+        }
+
+        function updateUserInfo() {
+            const newDisplayName = document.getElementById('displayName').value.trim();
+            
+            if (!newDisplayName) {
+                alert("Display name cannot be empty");
+                return;
+            }
+            
+            try {
+                // Update localStorage
+                const currentUser = newDisplayName.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+                localStorage.setItem('username', currentUser);
+                
+                // Update UI displays
+                document.getElementById('currentUserDisplay').textContent = currentUser;
+                
+                // Update mobile display if exists
+                const mobileDisplay = document.getElementById('currentUserDisplayMobile');
+                if (mobileDisplay) mobileDisplay.textContent = currentUser;
+                
+                // Close modal
+                toggleUserModal();
+                
+                console.log("✓ User information updated successfully");
+                
+            } catch (e) {
+                console.error("Failed to update user information:", e);
+                alert("Failed to update user information. Please try again.");
+            }
+        }
+
+        // Storage event listener to sync user info across all pages
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'username') {
+                const newUsername = e.newValue || localStorage.getItem('username') || 'ADMIN_NODE';
+                document.getElementById('currentUserDisplay').textContent = newUsername;
+                const mobileDisplay = document.getElementById('currentUserDisplayMobile');
+                if (mobileDisplay) mobileDisplay.textContent = newUsername;
+                console.log('✅ Username synced across pages:', newUsername);
+            }
+            if (e.key === 'userEmail') {
+                console.log('✅ User email synced across pages:', e.newValue);
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', function() {
             const user = localStorage.getItem('username') || 'ADMIN_NODE';
@@ -313,13 +446,27 @@
                     return;
                 }
                 
-                // Set verified user display
-                const username = user.email.split('@')[0].toUpperCase().replace(/[^A-Z0-9]/g, '_');
-                document.getElementById('currentUserDisplay').textContent = username;
-                
-                // Update mobile display if exists
-                const mobileDisplay = document.getElementById('currentUserDisplayMobile');
-                if (mobileDisplay) mobileDisplay.textContent = username;
+                // Check if user has custom display name in localStorage
+                const storedUsername = localStorage.getItem('username');
+                if (storedUsername && storedUsername !== 'ADMIN_NODE') {
+                    // Use the custom display name
+                    document.getElementById('currentUserDisplay').textContent = storedUsername;
+                    console.log('✅ Using custom display name:', storedUsername);
+                    
+                    // Update mobile display if exists
+                    const mobileDisplay = document.getElementById('currentUserDisplayMobile');
+                    if (mobileDisplay) mobileDisplay.textContent = storedUsername;
+                } else {
+                    // Use email-based username as fallback
+                    const username = user.email.split('@')[0].toUpperCase().replace(/[^A-Z0-9]/g, '_');
+                    localStorage.setItem('username', username);
+                    document.getElementById('currentUserDisplay').textContent = username;
+                    console.log('✅ Using email-based username:', username);
+                    
+                    // Update mobile display if exists
+                    const mobileDisplay = document.getElementById('currentUserDisplayMobile');
+                    if (mobileDisplay) mobileDisplay.textContent = username;
+                }
             } else {
                 // Redirect to login if not authenticated
                 window.location.href = 'index.html';
