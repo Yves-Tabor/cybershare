@@ -38,7 +38,7 @@
         header {
             position: fixed;
             top: 0; width: 100%;
-            height: 70px;
+            height: 85px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -50,10 +50,10 @@
         }
 
         .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
+            font-family: 'cambria', sans-serif;
+            font-size: 1.3rem;
             letter-spacing: 3px;
-            font-weight: 700;
+            font-weight: 900;
         }
 
         .logo span { color: var(--primary); }
@@ -66,6 +66,10 @@
             transition: 0.2s;
             font-family: 'Inter', sans-serif;
             font-weight: 600;
+        }
+        .btn:hover{
+          transform: scale(1.05);
+          border-color: var(--primary);
         }
 
         .btn-login { background: transparent; color: var(--text-main); border: 1px solid var(--border); margin-right: 10px; }
@@ -83,10 +87,11 @@
         }
 
         .hero h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3.5rem;
+            font-family: 'Cambria', sans-serif;
+            font-size: 5rem;
             margin-bottom: 1rem;
             color: #fff;
+
         }
 
         .tagline {
@@ -111,7 +116,11 @@
             transition: border 0.3s ease;
         }
 
-        .feature-card:hover { border-color: var(--primary); }
+        .feature-card:hover { 
+          border-color: var(--primary);
+          transform: scale(1.06);
+          transition: transform 0.3s ease;
+        }
         .feature-card h3 { color: var(--primary); font-size: 1rem; margin-bottom: 10px; text-transform: uppercase; }
         .feature-card p { font-size: 0.9rem; color: var(--text-dim); }
 
@@ -123,11 +132,11 @@
         }
 
         .modal {
-            background: #1a1d23;
+            background: rgba(10, 11, 13, 0.8);
             padding: 2.5rem;
             border-radius: 16px;
             width: 100%; max-width: 380px;
-            border: 1px solid var(--border);
+            border: 2px solid white;
         }
 
         .modal input {
@@ -148,7 +157,7 @@
             text-align: center;
             min-height: 1.2rem;
         }
-        .msg-error { color: var(--error); }
+        .msg-error { color: white; }
         .msg-success { color: var(--success); }
 
         .modal-active { display: flex; }
@@ -160,7 +169,7 @@
         }
         
         .unverified-badge {
-            background: rgba(255, 235, 59, 0.2);
+            background: rgba(10, 11, 13, 0.8);
             color: white;
             padding: 2px 8px;
             border-radius: 4px;
@@ -171,8 +180,7 @@
         }
         
         .verification-warning {
-            background: black;
-            border: 1px solid black;
+            background: rgba(10, 11, 13, 0.8);
             color: white;
             padding: 12px;
             border-radius: 6px;
@@ -313,7 +321,7 @@
                         warning.innerHTML = `
                             <strong>EMAIL VERIFICATION REQUIRED</strong><br>
                             Check your inbox for the verification email.<br>
-                            <small>If not received, check spam folder or <a href="#" onclick="resendVerification()" style="color: #ffeb3b;">resend verification</a></small>
+                            <small>If not received, check spam folder or <a href="#" onclick="resendVerification()" style="color: white;">resend verification</a></small>
                         `;
                         document.getElementById('loginForm').appendChild(warning);
                     }
@@ -387,7 +395,7 @@
                 const authButtons = document.querySelector('.auth-buttons');
                 const badge = document.createElement('span');
                 badge.className = 'unverified-badge';
-                badge.textContent = 'UNVERIFIED_USER';
+                badge.textContent = 'UNVERIFIED';
                 badge.style.marginLeft = '10px';
                 authButtons.appendChild(badge);
                 
