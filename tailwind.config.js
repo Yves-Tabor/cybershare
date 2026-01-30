@@ -2,7 +2,9 @@
 export default {
   content: [
     "./index.html",
-    "./home.html",        // <--- Add this line
+    "./home.html",
+    "./scanner.html",
+    "./resources.html",
     "./src/**/*.{js,ts}", // Watches your scripts
   ],
   theme: {

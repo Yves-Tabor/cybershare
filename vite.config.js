@@ -2,17 +2,19 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  // This ensures Vite treats both HTML files as independent pages
   build: {
     rollupOptions: {
       input: {
         main: 'index.html',
         home: 'home.html',
+        scanner: 'scanner.html',
+        resources: 'resources.html',
       },
     },
   },
   server: {
-    // This prevents Vite from forcing index.html on every route
-    historyApiFallback: false, 
+    port: 3000,
+    open: true,
+    historyApiFallback: true, 
   }
 });

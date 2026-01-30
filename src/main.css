@@ -1,0 +1,180 @@
+/* Custom styles for CyberShare */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-deep: #0a0b0d;
+  --card-bg: #14161a;
+  --primary: #4A9EFF;
+  --text-main: #e1e1e1;
+  --text-dim: #94a3b8;
+  --border: rgba(255, 255, 255, 0.08);
+  --error: #ff4a4a;
+  --success: #4aff9e;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-main);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0);
+  background-size: 40px 40px;
+  z-index: -1;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-active {
+  display: flex;
+}
+
+.modal {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.auth-msg {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+
+.msg-error {
+  color: var(--error);
+}
+
+.msg-success {
+  color: var(--success);
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-signup {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-signup:hover {
+  background: #3a8eef;
+  transform: translateY(-1px);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-deep);
+  color: var(--text-main);
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Custom animations */
+@keyframes scan {
+  0%, 100% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(10px); opacity: 1; }
+}
+
+.scan-animation {
+  animation: scan 2s ease-in-out infinite;
+}
+
+/* Sidebar transitions */
+#commentSidebar {
+  transition: transform 0.3s ease-in-out;
+}
+
+/* BW Body Styling */
+.bw-container {
+  background-color: #000;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.bw-input {
+  background: #000;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.bw-input:focus {
+  background: #fff;
+  color: #000;
+  outline: none;
+}
+
+.bw-button {
+  border: 1px solid #fff;
+  color: #fff;
+  background: transparent;
+  transition: all 0.2s;
+}
+
+.bw-button:hover:not(:disabled) {
+  background: #fff;
+  color: #000;
+}
+
+.bw-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Notification dot */
+#notif-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background-color: #EF4444;
+  border-radius: 50%;
+  border: 2px solid #0A0E1A;
+  display: none;
+}
