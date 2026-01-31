@@ -57,6 +57,22 @@
             border: 2px solid #0A0E1A;
             display: none;
         }
+
+        /* Custom Scrollbar */
+        #commentList::-webkit-scrollbar {
+            width: 6px;
+        }
+        #commentList::-webkit-scrollbar-track {
+            background: #000;
+            border: 1px solid #333;
+        }
+        #commentList::-webkit-scrollbar-thumb {
+            background: #fff;
+            border-radius: 3px;
+        }
+        #commentList::-webkit-scrollbar-thumb:hover {
+            background: #ccc;
+        }
     </style>
 </head>
 <body class="bg-black text-gray-100 font-sans overflow-x-hidden">
@@ -144,12 +160,12 @@
     </nav>
 
     <aside id="commentSidebar" class="fixed right-0 top-20 h-[calc(100vh-5rem)] w-80 bg-black border-l border-white z-40 transform translate-x-full shadow-2xl">
-        <div class="p-6">
+        <div class="p-6 flex flex-col h-full">
             <h2 class="font-mono font-bold text-white mb-6 uppercase tracking-wider border-b border-white pb-2">Analysis Logs</h2>
-            <div id="commentList" class="space-y-4">
+            <div id="commentList" class="space-y-4 flex-1 overflow-y-auto max-h-[calc(100vh-10rem)]">
                 <div class="p-3 border border-gray-700 rounded-lg">
-                    <p class="text-[10px] text-gray-500 font-mono mb-1">System_Initialization</p>
-                    <p class="text-xs text-gray-400">Awaiting target link verification...</p>
+                    <p class="text-[10px] text-gray-500 font-mono mb-1">System Initialization</p>
+                    <p class="text-xs text-gray-400">Waiting for a link to scan ...</p>
                 </div>
             </div>
         </div>
@@ -158,25 +174,30 @@
     <main class="max-w-4xl mx-auto px-6 py-16">
         <div class="text-center mb-12">
             <h1 class="text-6xl font-bold mb-4 tracking-tighter lowercase">Vulnerability Audit</h1>
-            <p class="text-gray-500 uppercase text-xs tracking-[0.4em]">Monochrome Security Layer</p>
+            <p class="text-gray-500 uppercase text-xs tracking-[0.4em]">Platform Security Layer</p>
         </div>
 
         <div class="bw-container p-10 bg-black rounded-xl">
             <form id="scanForm" class="space-y-8" onsubmit="handleScan(event)">
                 <div>
                     <label class="block text-xs uppercase mb-4 tracking-widest text-gray-400 font-bold font-mono rounded-lg">Enter Website URL</label>
-                    <input type="url" id="urlInput" placeholder="https://example.com" class="bw-input w-full p-5 text-lg font-mono rounded-lg" required>
+                    <input type="url" id="urlInput" placeholder="https://example.com" class="bw-input w-full p-5 text-lg rounded-lg" required>
                 </div>
 
                 <div class="flex items-start gap-4 p-5 border border-dashed border-gray-700 rounded-lg">
                     <input type="checkbox" id="ackCheck" class="w-5 h-5 mt-1 accent-white rounded" onchange="toggleButton()">
-                    <label for="ackCheck" class="text-[11px] leading-relaxed text-gray-400 uppercase font-mono rounded-lg">
-                        I acknowledge that this website belongs to me and I authorize a security scan including header analysis, fingerprinting, and disclosure checks.
-                    </label>
+                    <div class="flex-1">
+                        <label for="ackCheck" class="text-[11px] leading-relaxed text-gray-400 uppercase rounded-lg">
+                            I acknowledge I have authorization to conduct a security scan including header analysis, fingerprinting, and disclosure checks...
+                        </label>
+                        <button type="button" onclick="toggleLegalModal()" class="text-[10px] text-white underline ml-2 uppercase">
+                            Read More
+                        </button>
+                    </div>
                 </div>
 
-                <button type="submit" id="scanBtn" disabled class="bw-button w-full py-5 font-bold uppercase tracking-widest font-mono rounded-lg">
-                    Initiate Deep Scan
+                <button type="submit" id="scanBtn" disabled class="bw-button w-full py-5 font-bold lowercase tracking-widest rounded-lg">
+                    Start scanning
                 </button>
             </form>
             <div id="progressContainer" class="hidden mt-8 w-full bg-gray-900 h-1">
@@ -185,7 +206,14 @@
         </div>
 
         <div id="scanStatus" class="mt-8 text-center text-[10px] font-mono text-gray-600 uppercase tracking-widest">
-            Awaiting Command...
+            Waiting for command...
+        </div>
+
+        <!-- Download Report Button (Hidden by default) -->
+        <div id="downloadSection" class="hidden mt-6 text-center">
+            <button id="downloadBtn" onclick="downloadReport()" class="px-6 py-3 bg-white text-black hover:bg-black border-2 border-white hover:text-white transition-all text-md lowercase tracking-widest rounded-md">
+                 Download PDF Report
+            </button>
         </div>
     </main>
 
@@ -194,10 +222,14 @@
         <div class="bg-black border-2 border-white w-full max-w-md rounded-xl p-8 relative shadow-2xl">
             <h2 class="font-bold text-white mb-6 text-xl tracking-tighter lowercase">System Protocols</h2>
             <ul class="space-y-4 font-mono text-xs text-gray-400">
-                <li><span class="text-white">[01]</span> NO_SPAM: Excessive broadcasting throttles your node.</li>
-                <li><span class="text-white">[02]</span> INTEGRITY: Hostile code is automatically scrubbed.</li>
-                <li><span class="text-white">[03]</span> UPLINK: Posts are persistent and visible to all nodes.</li>
-                <li><span class="text-white">[04]</span> COMMS: All replies are transmitted in real-time.</li>
+                <li><span class="text-white">01.</span> NO SPAM: System will slow you down when broadcasting excessively</li>
+                <li><span class="text-white">02.</span> INTEGRITY: Dangerous code is cleaned out immediately</li>
+                <li><span class="text-white">03.</span> UPLOADS: Posts are persistent and visible to all users</li>
+                <li><span class="text-white">04.</span> COMMENTS: All replies are transmitted in real-time</li>
+                <li><span class="text-white">05.</span> REPORTS: Do not scan a link you don't have authorization to scan</li>
+                <li><span class="text-white">05.</span> SCANNER: To check scanning results click on notification icon at the header</li>
+                <li><span class="text-white">06.</span> PRIVACY: Your identity is protected at all times</li>
+                <li><span class="text-white">07.</span> SUPPORT: <a href="mailto:walvesoutis@gmail.com" class="text-white underline">Contact us</a> if you encounter any issues</li>
             </ul>
             <button onclick="toggleModal('protocolModal')" class="mt-8 w-full py-3 border border-white text-white hover:bg-gray-800 transition-all text-[14px] lowercase tracking-tighter">Acknowledge</button>
         </div>
@@ -212,6 +244,87 @@
             <div class="flex gap-4">
                 <button onclick="toggleLogoutModal()" class="flex-1 py-3 border border-white text-white hover:bg-gray-800 transition-all text-[14px] lowercase tracking-tighter">Cancel</button>
                 <button onclick="confirmLogout()" class="flex-1 py-3 bg-red-600 text-white hover:bg-red-700 transition-all text-[14px] lowercase tracking-tighter">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legal Disclaimer Modal -->
+    <div id="legalModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="toggleLegalModal()"></div>
+        <div class="bg-black border-2 border-white w-full max-w-4xl max-h-[80vh] overflow-y-auto rounded-xl p-8 relative shadow-2xl">
+            <h2 class="font-bold text-white mb-6 text-xl tracking-tighter uppercase">Legal Disclaimer & Usage Terms</h2>
+            
+            <div class="space-y-6 text-gray-300 font-mono text-sm">
+                <div class="border-l-4 border-red-500 pl-4">
+                    <h3 class="text-white font-bold mb-2 uppercase">WARNING: LEGAL CONSEQUENCES APPLY</h3>
+                    <p>Unauthorized use of this security scanner may result in severe legal penalties including criminal charges and civil liability.</p>
+                </div>
+
+                <div>
+                    <h3 class="text-white font-bold mb-2 uppercase">1. Authorized Use Only</h3>
+                    <p>You must be the legal owner or have explicit written permission from the website owner before scanning. Scanning websites you do not own is illegal and constitutes unauthorized access under computer crime laws.</p>
+                </div>
+
+                <div>
+                    <h3 class="text-white font-bold mb-2 uppercase">2. User Fingerprinting & Tracking</h3>
+                    <p class="text-yellow-400">This system maintains permanent records including:</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1 text-gray-400">
+                        <li>User IP address and geolocation data</li>
+                        <li>Browser fingerprint and device information</li>
+                        <li>Email address and account credentials</li>
+                        <li>Timestamp and duration of all scans</li>
+                        <li>Target URLs and scan results</li>
+                        <li>Session ID and unique user identifier</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-white font-bold mb-2 uppercase">3. Legal Consequences</h3>
+                    <p class="text-red-400">Violators may face:</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1 text-gray-400">
+                        <li>Criminal charges under Computer Fraud and Abuse Act (CFAA)</li>
+                        <li>Civil lawsuits for damages and unauthorized access</li>
+                        <li>Immediate and permanent account termination</li>
+                        <li>Reporting to law enforcement agencies</li>
+                        <li>Legal action for damages up to $250,000 per violation</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-white font-bold mb-2 uppercase">4. Permitted Use Cases</h3>
+                    <p class="text-green-400">You may ONLY scan:</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1 text-gray-400">
+                        <li>Websites you legally own</li>
+                        <li>Websites for which you have explicit permission to test</li>
+                        <li>Your own development and testing environments</li>
+                        <li>Websites explicitly designated for security testing</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-white font-bold mb-2 uppercase">5. Data Retention & Sharing</h3>
+                    <p>All scan data is permanently stored and may be shared with:</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1 text-gray-400">
+                        <li>Law enforcement agencies upon request</li>
+                        <li>Website owners for verification purposes</li>
+                        <li>Legal authorities during investigations</li>
+                        <li>Cybersecurity incident response teams</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-white font-bold mb-2 uppercase">6. No Warranty</h3>
+                    <p>This scanner is provided "as-is" without warranty. Results are for educational purposes only. Professional security assessments should be conducted by certified professionals.</p>
+                </div>
+
+                <div class="border-t border-gray-700 pt-4">
+                    <p class="text-xs text-gray-500">By clicking "I Understand & Accept", you acknowledge that you have read, understood, and agree to be legally bound by these terms. You confirm that you have legal authority to scan the target website and accept full legal responsibility for your actions.</p>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 mt-8">
+                <button onclick="toggleLegalModal()" class="flex-1 py-3 border border-white text-white hover:bg-gray-800 transition-all text-[14px] lowercase tracking-tighter">Cancel</button>
+                <button onclick="acceptLegalTerms()" class="flex-1 py-3 bg-red-600 text-white hover:bg-red-700 transition-all text-[14px] lowercase tracking-tighter">I Understand & Accept</button>
             </div>
         </div>
     </div>
@@ -237,7 +350,7 @@
                     <label class="block text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Account Status</label>
                     <div class="flex items-center gap-2">
                         <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span class="text-green-500 font-mono text-sm">● VERIFIED_NODE</span>
+                        <span class="text-green-500 font-mono text-sm">VERIFIED USER</span>
                     </div>
                 </div>
             </div>
@@ -291,38 +404,185 @@
             }
         }
 
+        // Global variable to store scan results
+        let lastScanResults = null;
+        let lastScanUrl = null;
+        let lastScanTimestamp = null;
+        
+        // Session management
+        let sessionId = localStorage.getItem('cybershare_session_id');
+        if (!sessionId) {
+            sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('cybershare_session_id', sessionId);
+        }
+
         async function handleScan(e) {
             e.preventDefault();
             const url = document.getElementById('urlInput').value;
             const status = document.getElementById('scanStatus');
             const progress = document.getElementById('progressBar');
             const progCont = document.getElementById('progressContainer');
+            const scanBtn = document.getElementById('scanBtn');
 
             progCont.classList.remove('hidden');
-            status.innerText = "Analyzing: " + url.toUpperCase();
+            status.innerText = "Initializing scan for: " + url.toUpperCase();
+            scanBtn.disabled = true;
+            scanBtn.textContent = "Scanning...";
 
-            // Logic for all requested points
-            const scanSteps = [
-                { t: "HTTPS/SSL", s: url.startsWith('https') ? "PASS" : "FAIL", r: "Force TLS 1.3 encryption." },
-                { t: "SECURITY HEADERS", s: "FAIL", r: "Missing CSP and HSTS headers." },
-                { t: "COOKIE ATTRIBS", s: "WARN", r: "Set HttpOnly and Secure flags." },
-                { t: "PORT DETECTION", s: "INFO", r: "Ensure ports 22/3306 are firewalled." },
-                { t: "FINGERPRINTING", s: "FAIL", r: "Server tokens exposed. Mask server header." },
-                { t: "OUTDATED TECH", s: "WARN", r: "Legacy JS library detected. Update to latest." },
-                { t: "INFO DISCLOSURE", s: "FAIL", r: "Check /.git or /.env for public access." },
-                { t: "DNS/EMAIL SEC", s: "WARN", r: "DMARC policy not found. Add DNS record." }
-            ];
+            try {
+                // Check legal terms acceptance
+                const legalAccepted = localStorage.getItem('legalTermsAccepted');
+                const legalVersion = localStorage.getItem('legalTermsVersion');
+                
+                if (!legalAccepted || legalVersion !== '1.0') {
+                    alert('You must accept the legal terms before scanning. Please click "Read More" and accept the terms.');
+                    toggleLegalModal();
+                    return;
+                }
 
-            for (let i = 0; i < scanSteps.length; i++) {
-                await new Promise(r => setTimeout(r, 800));
-                addComment(scanSteps[i].t, scanSteps[i].s, scanSteps[i].r);
-                progress.style.width = ((i + 1) / scanSteps.length * 100) + "%";
+                // Call backend API
+                const response = await fetch('http://localhost:3001/api/scan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Session-ID': sessionId,
+                        'X-Legal-Accepted': legalAccepted,
+                        'X-Legal-Version': legalVersion
+                    },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Scan failed');
+                }
+
+                // Clear previous results
+                document.getElementById('commentList').innerHTML = '';
+
+                // Display results
+                const scanSteps = data.results;
+                
+                for (let i = 0; i < scanSteps.length; i++) {
+                    await new Promise(r => setTimeout(r, 500));
+                    const step = scanSteps[i];
+                    
+                    let statusClass = step.status.toLowerCase();
+                    if (statusClass === 'pass') statusClass = 'success';
+                    if (statusClass === 'fail') statusClass = 'danger';
+                    if (statusClass === 'warn') statusClass = 'warning';
+                    
+                    addComment(step.title, step.status.toUpperCase(), step.recommendation);
+                    progress.style.width = ((i + 1) / scanSteps.length * 100) + "%";
+                }
+
+                // Store scan results for download
+                lastScanResults = scanSteps;
+                lastScanUrl = url;
+                lastScanTimestamp = new Date().toISOString();
+
+                // Show download button
+                document.getElementById('downloadSection').classList.remove('hidden');
+
+                status.innerText = `Scan Complete! ${scanSteps.length} security checks performed.`;
+
+            } catch (error) {
+                console.error('Scan error:', error);
+                status.innerText = `Scan Failed: ${error.message}`;
+                addComment('SCAN ERROR', 'FAIL', error.message);
+            } finally {
+                scanBtn.disabled = false;
+                scanBtn.textContent = "Start Scanning";
+            }
+        }
+
+        // Download PDF Report Function
+        async function downloadReport() {
+            if (!lastScanResults || !lastScanUrl) {
+                alert('No scan results available. Please run a scan first.');
+                return;
             }
 
-            status.innerText = "Audit Complete. Results logged to sidebar.";
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.disabled = true;
+            downloadBtn.textContent = 'Generating PDF...';
+
+            try {
+                const response = await fetch('http://localhost:3001/api/download-report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Session-ID': sessionId
+                    },
+                    body: JSON.stringify({
+                        results: lastScanResults,
+                        url: lastScanUrl,
+                        timestamp: lastScanTimestamp
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate PDF');
+                }
+
+                // Create download link
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = `cybershare-scan-report-${Date.now()}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(downloadUrl);
+                document.body.removeChild(a);
+
+                console.log('PDF report downloaded successfully');
+
+            } catch (error) {
+                console.error('Download error:', error);
+                alert('Failed to download report. Please try again.');
+            } finally {
+                downloadBtn.disabled = false;
+                downloadBtn.textContent = 'Download PDF Report';
+            }
         }
 
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+        
+        function toggleLegalModal() {
+            const modal = document.getElementById('legalModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function acceptLegalTerms() {
+            // Store legal acceptance timestamp
+            localStorage.setItem('legalTermsAccepted', Date.now().toString());
+            localStorage.setItem('legalTermsVersion', '1.0');
+            
+            // Close modal
+            toggleLegalModal();
+            
+            // Show confirmation
+            const status = document.getElementById('scanStatus');
+            status.innerText = 'Legal terms accepted. You may now proceed with scanning.';
+            
+            console.log('Legal terms accepted by user:', localStorage.getItem('username') || 'Anonymous');
+        }
+
+        // Check if legal terms have been accepted
+        function checkLegalAcceptance() {
+            const accepted = localStorage.getItem('legalTermsAccepted');
+            const version = localStorage.getItem('legalTermsVersion');
+            
+            // If terms haven't been accepted or version is different, show modal
+            if (!accepted || version !== '1.0') {
+                // Auto-show legal modal on page load
+                setTimeout(() => {
+                    toggleLegalModal();
+                }, 1000);
+            }
+        }
         
         function handleLogout() {
             toggleLogoutModal();
@@ -358,7 +618,7 @@
             const modal = document.getElementById('userModal');
             modal.classList.toggle('hidden');
             
-            // Populate user info when opening modal
+
             if (!modal.classList.contains('hidden')) {
                 const username = localStorage.getItem('username') || 'ADMIN_NODE';
                 const userEmail = localStorage.getItem('userEmail') || '';
@@ -387,10 +647,10 @@
                 const mobileDisplay = document.getElementById('currentUserDisplayMobile');
                 if (mobileDisplay) mobileDisplay.textContent = currentUser;
                 
-                // Close modal
+                
                 toggleUserModal();
                 
-                console.log("✓ User information updated successfully");
+                console.log("User information updated successfully");
                 
             } catch (e) {
                 console.error("Failed to update user information:", e);
@@ -398,23 +658,26 @@
             }
         }
 
-        // Storage event listener to sync user info across all pages
+        // Storage event listener to sync user information updates
         window.addEventListener('storage', (e) => {
             if (e.key === 'username') {
                 const newUsername = e.newValue || localStorage.getItem('username') || 'ADMIN_NODE';
                 document.getElementById('currentUserDisplay').textContent = newUsername;
                 const mobileDisplay = document.getElementById('currentUserDisplayMobile');
                 if (mobileDisplay) mobileDisplay.textContent = newUsername;
-                console.log('✅ Username synced across pages:', newUsername);
+                console.log(' Username synced across pages:', newUsername);
             }
             if (e.key === 'userEmail') {
-                console.log('✅ User email synced across pages:', e.newValue);
+                console.log(' User email synced across pages:', e.newValue);
             }
         });
 
         document.addEventListener('DOMContentLoaded', function() {
             const user = localStorage.getItem('username') || 'ADMIN_NODE';
             document.getElementById('currentUserDisplay').textContent = user;
+            
+            // Check legal terms acceptance
+            checkLegalAcceptance();
         });
     </script>
 
@@ -442,7 +705,7 @@
                 if (storedUsername && storedUsername !== 'ADMIN_NODE') {
                     // Use the custom display name
                     document.getElementById('currentUserDisplay').textContent = storedUsername;
-                    console.log('✅ Using custom display name:', storedUsername);
+                    console.log('Using custom display name:', storedUsername);
                     
                     // Update mobile display if exists
                     const mobileDisplay = document.getElementById('currentUserDisplayMobile');
@@ -452,7 +715,7 @@
                     const username = user.email.split('@')[0].toUpperCase().replace(/[^A-Z0-9]/g, '_');
                     localStorage.setItem('username', username);
                     document.getElementById('currentUserDisplay').textContent = username;
-                    console.log('✅ Using email-based username:', username);
+                    console.log('Using email-based username:', username);
                     
                     // Update mobile display if exists
                     const mobileDisplay = document.getElementById('currentUserDisplayMobile');

@@ -12,6 +12,7 @@
                 extend: {
                     colors: {
                         'cyber-dark': '#0A0E1A',
+                        'cyber-dark': '#0A0E1A',
                         'cyber-darker': '#060911',
                         'cyber-blue': '#00D9FF',
                         'cyber-purple': '#8B5CF6',
@@ -135,7 +136,7 @@
     <main class="max-w-4xl mx-auto px-6 py-20">
         <div class="text-center mb-16">
             <h1 class="text-7xl font-bold mb-4 tracking-tighter lowercase">Knowledge Hub</h1>
-            <p class="text-zinc-500 font-mono text-sm tracking-widest underline decoration-white decoration-2 underline-offset-8">MONOCHROME RESOURCE INTERFACE</p>
+            <p class="text-zinc-500 text-sm tracking-widest decoration-white decoration-2 underline-offset-8">PLATFORM RESOURCE INTERFACE</p>
         </div>
 
         <div class="bw-card p-8">
@@ -201,17 +202,17 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 id="commentResourceTitle" class="font-bold text-white text-xl tracking-tighter lowercase">Resource Comments</h2>
-                        <p id="commentCount" class="text-[10px] text-gray-500 font-mono mt-1 uppercase">0 COMMENTS</p>
+                        <p id="commentCount" class="text-[10px] text-gray-500 mt-1 lowercase">0 COMMENTS</p>
                     </div>
                     <button onclick="closeCommentModal()" class="text-gray-500 hover:text-white text-2xl">&times;</button>
                 </div>
             </div>
             <div id="commentsList" class="flex-1 overflow-y-auto p-6 space-y-4">
-                <div class="text-center py-10 text-gray-600 font-mono text-xs uppercase">Loading comments...</div>
+                <div class="text-center py-10 text-gray-600 text-xs uppercase">Loading comments...</div>
             </div>
             <div class="p-6 border-t border-white/20">
                 <textarea id="commentText" placeholder="TYPE YOUR COMMENT..." class="bw-input w-full p-4 h-24 mb-4 resize-none font-mono text-sm lowercase"></textarea>
-                <button onclick="submitComment()" class="bw-btn w-full py-3 font-bold uppercase tracking-widest font-mono text-sm">Post Comment</button>
+                <button onclick="submitComment()" class="bw-btn w-full py-3 font-bold lowercase tracking-widest text-sm">Post Comment</button>
             </div>
         </div>
     </div>
@@ -265,7 +266,7 @@
                     <label class="block text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Account Status</label>
                     <div class="flex items-center gap-2">
                         <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span class="text-green-500 font-mono text-sm">● VERIFIED_NODE</span>
+                        <span class="text-green-500 font-mono text-sm">● VERIFIED USER</span>
                     </div>
                 </div>
             </div>
@@ -304,6 +305,16 @@
         let allResources = [];
         let currentResourceId = null;
 
+        // Initialize user data from localStorage
+        function initializeUserData() {
+            currentUser = localStorage.getItem('username') || 'ADMIN_NODE';
+            currentUserEmail = localStorage.getItem('userEmail') || '';
+            console.log('User data initialized:', { currentUser, currentUserEmail });
+        }
+
+        // Initialize on page load
+        initializeUserData();
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // Check email verification
@@ -319,8 +330,9 @@
                 const storedUsername = localStorage.getItem('username');
                 if (storedUsername && storedUsername !== 'ADMIN_NODE') {
                     // Use the custom display name
+                    currentUser = storedUsername;
                     document.getElementById('currentUserDisplay').textContent = storedUsername;
-                    console.log('✅ Using custom display name:', storedUsername);
+                    console.log(' Using custom display name:', storedUsername);
                     
                     // Update mobile display if exists
                     const mobileDisplay = document.getElementById('currentUserDisplayMobile');
@@ -328,16 +340,19 @@
                 } else {
                     // Use email-based username as fallback
                     const username = user.email.split('@')[0].toUpperCase().replace(/[^A-Z0-9]/g, '_');
+                    currentUser = username;
                     localStorage.setItem('username', username);
                     document.getElementById('currentUserDisplay').textContent = username;
-                    console.log('✅ Using email-based username:', username);
+                    console.log(' Using email-based username:', username);
                     
                     // Update mobile display if exists
                     const mobileDisplay = document.getElementById('currentUserDisplayMobile');
                     if (mobileDisplay) mobileDisplay.textContent = username;
                 }
                 
+                // Update email
                 currentUserEmail = user.email;
+                localStorage.setItem('userEmail', user.email);
             } else {
                 window.location.href = 'index.html';
             }
@@ -371,7 +386,7 @@
             const resultsContainer = document.getElementById('searchResults');
             
             if (!searchTerm) {
-                resultsContainer.innerHTML = '<div class="text-center py-10 text-gray-600 font-mono text-xs uppercase">Type to search resources...</div>';
+                resultsContainer.innerHTML = '<div class="text-center py-10 text-gray-600 text-xs lowercase">Type to search resources...</div>';
                 return;
             }
             
@@ -381,7 +396,7 @@
             );
             
             if (results.length === 0) {
-                resultsContainer.innerHTML = '<div class="text-center py-10 text-gray-600 font-mono text-xs uppercase">No results found</div>';
+                resultsContainer.innerHTML = '<div class="text-center py-10 text-gray-600 text-xs uppercase">No results found</div>';
                 return;
             }
             
@@ -527,6 +542,7 @@
             }
         });
 
+        //Here am creatind a post
         function createPostElement(r) {
             const timeAgo = r.timestamp?.toDate ? getRelativeTime(r.timestamp.toDate()) : 'Just now';
             
@@ -538,33 +554,29 @@
                         </div>
                         <div>
                             <h3 class="font-bold text-white">${r.username}</h3>
-                            <p class="text-sm text-gray-400 font-mono">@${r.username.toLowerCase()} • ${timeAgo}</p>
+                            <p class="text-sm text-gray-400">@${r.username.toLowerCase()} • ${timeAgo}</p>
                         </div>
                     </div>
                     
                     <div class="mb-4">
-                        <h2 class="text-xl font-bold text-white mb-2">${r.title}</h2>
-                        <p class="text-gray-300 leading-relaxed">${r.content}</p>
+                        <h2 class="text-md font-bold text-white mb-2">${r.title}</h2>
+                        <p class="text-gray-300 text-sm leading-relaxed">${r.content}</p>
                     </div>
-
+                    
                     ${r.files?.length ? `
                         <div class="space-y-2 mb-4">
-                            <p class="text-xs text-gray-500 font-mono uppercase mb-2">Attached Files:</p>
                             ${r.files.map((f, index) => `
                                 <div class="bg-black border border-gray-700 rounded-lg p-3 flex items-center justify-between hover:border-cyber-blue/50 transition">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-gradient-to-br from-cyber-blue to-cyber-purple rounded-lg flex items-center justify-center">
-                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                            </svg>
-                                        </div>
+                                        <div class="w-10 h-10 bg-gradient-to-br from-black to-white rounded-lg flex items-center justify-center">
+                                        File</div>
                                         <div>
                                             <p class="font-semibold text-white text-sm">${f.name}</p>
                                             <p class="text-xs text-gray-400 font-mono">${formatFileSize(f.size)} • ${f.type || 'File'}</p>
                                         </div>
                                     </div>
-                                    <button onclick="initiateAdvancedDownload('${r.id}', ${index}, '${f.name}', '${f.url}', ${f.size})" class="px-4 py-2 bg-cyber-blue/20 text-cyber-blue rounded-lg hover:bg-cyber-blue hover:text-black transition font-medium text-xs uppercase">
-                                        Turbo Download
+                                    <button onclick="initiateAdvancedDownload('${r.id}', ${index}, '${f.name}', '${f.url}', ${f.size})" class="px-4 py-2 hover:bg-cyber-blue/20 hover:text-cyber-blue rounded-lg bg-white text-black transition font-medium text-xs lowercase">
+                                        Download
                                     </button>
                                 </div>
                             `).join('')}
@@ -573,10 +585,10 @@
 
                     <div class="flex items-center justify-between pt-4 border-t border-gray-800">
                         <div class="flex flex-wrap gap-2">
-                            <span class="px-3 py-1 bg-cyber-blue/10 text-cyber-blue rounded-full text-xs font-mono">#Resource</span>
-                            <span class="px-3 py-1 bg-cyber-purple/10 text-cyber-purple rounded-full text-xs font-mono">#Knowledge</span>
+                            <span class="px-3 py-1 bg-cyber-blue/10 border border-cyber-blue text-cyber-blue rounded-full text-xs">#Resource</span>
+                            <span class="px-3 py-1 bg-black border border-white text-white rounded-full text-xs">#Knowledge</span>
                         </div>
-                        <button onclick="openCommentModal('${r.id}', '${r.title}')" class="flex items-center gap-2 px-4 py-2 border border-white/20 hover:border-cyber-blue text-gray-400 hover:text-cyber-blue rounded-lg transition font-mono text-xs uppercase">
+                        <button onclick="openCommentModal('${r.id}', '${r.title}')" class="flex items-center gap-2 px-4 py-2 border border-white/20 hover:border-cyber-blue text-gray-400 hover:text-cyber-blue rounded-lg transition text-xs lowercase">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                             </svg>
@@ -701,7 +713,7 @@
             attachedFiles = attachedFiles.concat(Array.from(files));
             displayAttachedFiles();
         }
-
+        //HEre am publishing
         function displayAttachedFiles() {
             const list = document.getElementById('attachedFilesList');
             list.innerHTML = '';
@@ -773,43 +785,43 @@
             });
         }
 
-        // Advanced High-Performance Download System
+        // Here is my Download System
         window.initiateAdvancedDownload = (resourceId, fileIndex, fileName, fileUrl, fileSize) => {
-            // Create advanced download modal
+            // Create download modal
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md';
             modal.innerHTML = `
                 <div class="bg-black border-2 border-white w-full max-w-2xl rounded-xl p-8 relative shadow-2xl">
-                    <h3 class="font-bold text-white text-xl mb-6 tracking-tighter lowercase">Turbo Download Protocol</h3>
+                    <h3 class="font-bold text-white text-xl mb-6 tracking-tighter lowercase"> Download</h3>
                     <div class="space-y-4 mb-6">
                         <div class="bg-black border border-gray-700 rounded-lg p-4">
                             <p class="text-sm text-gray-400 font-mono mb-2">File Information:</p>
                             <p class="text-white font-semibold">${fileName}</p>
-                            <p class="text-xs text-gray-500 font-mono">Size: ${formatFileSize(fileSize)} • Type: ${getFileExtension(fileName)}</p>
+                            <p class="text-xs text-gray-500">Size: ${formatFileSize(fileSize)} • Type: ${getFileExtension(fileName)}</p>
                         </div>
-                        <div class="bg-cyber-blue/10 border border-cyber-blue/30 rounded-lg p-4">
-                            <p class="text-xs text-cyber-blue font-mono mb-2">DOWNLOAD ENGINE:</p>
-                            <p class="text-white font-mono text-sm">Turbo Mode • Chunked Transfer • Resume Ready</p>
+                        <div class="bg-black border-2 border-white rounded-lg p-4">
+                            <p class="text-xs text-white mb-2">PROTOCOL:</p>
+                            <p class="text-white font-mono text-md">Fast Download • Chunked Transfer • Resume Ready</p>
                         </div>
                         <div class="space-y-2">
-                            <div class="flex justify-between text-xs font-mono">
+                            <div class="flex justify-between text-xs">
                                 <span class="text-gray-400">Progress</span>
-                                <span id="downloadProgress" class="text-cyber-blue">0%</span>
+                                <span id="downloadProgress" class="text-white">0%</span>
                             </div>
                             <div class="w-full bg-gray-800 rounded-full h-2">
-                                <div id="downloadBar" class="bg-cyber-blue h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                <div id="downloadBar" class="bg-white h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
                             </div>
-                            <div class="flex justify-between text-xs font-mono">
+                            <div class="flex justify-between text-xs">
                                 <span id="downloadSpeed" class="text-gray-500">0 MB/s</span>
                                 <span id="downloadEta" class="text-gray-500">--:--</span>
                             </div>
                         </div>
                     </div>
                     <div class="space-y-3">
-                        <button onclick="startTurboDownload('${fileName}', '${fileUrl}', ${fileSize}, this)" class="w-full py-3 bg-cyber-blue text-black hover:bg-cyber-blue/80 transition font-bold uppercase tracking-widest font-mono text-sm">
-                            Initialize Turbo Download
+                        <button onclick="startTurboDownload('${fileName}', '${fileUrl}', ${fileSize}, this)" class="w-full py-3 bg-cyber-blue text-black hover:bg-cyber-blue/80 transition font-bold uppercase tracking-wides text-sm">
+                            Download
                         </button>
-                        <button onclick="this.closest('.fixed').remove()" class="w-full py-3 border border-white text-white hover:bg-gray-800 transition font-mono text-sm uppercase">
+                        <button onclick="this.closest('.fixed').remove()" class="w-full py-3 border border-white text-white hover:bg-gray-800 transition text-sm lowercase">
                             Cancel
                         </button>
                     </div>
@@ -826,7 +838,7 @@
             const etaEl = modal.querySelector('#downloadEta');
             
             button.disabled = true;
-            button.innerText = "INITIALIZING TURBO MODE...";
+            button.innerText = "INITIALIZING...";
             
             // Check URL type
             const isDemo = fileUrl.includes('fake-download-url.com');
@@ -837,7 +849,7 @@
             
             if (isDemo) {
                 // Simulate download for demo purposes
-                button.innerText = "TURBO DOWNLOAD ACTIVE";
+                button.innerText = "DOWNLOAD ACTIVE";
                 let progress = 0;
                 const startTime = Date.now();
                 
@@ -849,8 +861,8 @@
                         
                         // Show completion
                         button.innerText = "DOWNLOAD COMPLETE";
-                        button.classList.remove('bg-cyber-blue', 'text-black');
-                        button.classList.add('bg-cyber-green', 'text-white');
+                        button.classList.remove('bg-white', 'text-black');
+                        button.classList.add('bg-black', 'text-white');
                         progressEl.textContent = "100%";
                         barEl.style.width = "100%";
                         speedEl.textContent = "Complete";
@@ -867,10 +879,10 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                         </svg>
                                     </div>
-                                    <h4 class="text-white font-bold text-lg mb-2">Demo Download Complete</h4>
-                                    <p class="text-gray-400 text-sm font-mono">${fileName}</p>
-                                    <p class="text-cyber-green text-xs font-mono mt-2">${formatFileSize(fileSize)} • Simulation Mode</p>
-                                    <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-cyber-green text-black font-bold uppercase tracking-widest font-mono text-xs">
+                                    <h4 class="text-white font-bold text-lg mb-2">Download Complete</h4>
+                                    <p class="text-gray-400 text-md">${fileName}</p>
+                                    <p class="text-cyber-green text-xs mt-2">${formatFileSize(fileSize)} • Download Mode</p>
+                                    <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-white text-black font-bold lowercase tracking-widest text-xs">
                                         Close
                                     </button>
                                 </div>
@@ -891,7 +903,7 @@
                 
             } else if (isIndexedDB) {
                 // Download from IndexedDB (real file, larger capacity)
-                button.innerText = "TURBO DOWNLOAD ACTIVE";
+                button.innerText = "DOWNLOAD ACTIVE";
                 let progress = 0;
                 const startTime = Date.now();
                 const cacheKey = fileUrl.replace('indexeddb://', '');
@@ -940,10 +952,10 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                             </svg>
                                         </div>
-                                        <h4 class="text-white font-bold text-lg mb-2">IndexedDB Download Complete</h4>
-                                        <p class="text-gray-400 text-sm font-mono">${fileName}</p>
-                                        <p class="text-cyber-green text-xs font-mono mt-2">${formatFileSize(fileSize)} • High-Capacity Storage</p>
-                                        <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-cyber-green text-black font-bold uppercase tracking-widest font-mono text-xs">
+                                        <h4 class="text-white font-bold text-lg mb-2">Download Complete</h4>
+                                        <p class="text-gray-400 text-md">${fileName}</p>
+                                        <p class="text-white text-xs mt-2">${formatFileSize(fileSize)} • High-Capacity Storage</p>
+                                        <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-white text-black font-bold lowercase tracking-widest text-xs">
                                             Close
                                         </button>
                                     </div>
@@ -965,7 +977,7 @@
                 } catch (error) {
                     console.error('IndexedDB download failed:', error);
                     button.innerText = "DOWNLOAD FAILED";
-                    button.classList.add('bg-cyber-red', 'text-white');
+                    button.classList.add('bg-black', 'text-white');
                     alert(`IndexedDB download failed: ${error.message}`);
                 }
                 
@@ -984,10 +996,10 @@
                                 </svg>
                             </div>
                             <h4 class="text-white font-bold text-lg mb-2">Large File Detected</h4>
-                            <p class="text-gray-400 text-sm font-mono">${fileName}</p>
-                            <p class="text-cyber-yellow text-xs font-mono mt-2">${formatFileSize(fileSize)} • Storage Limit Exceeded</p>
+                            <p class="text-gray-400 text-md">${fileName}</p>
+                            <p class="text-white text-xs mt-2">${formatFileSize(fileSize)} • Storage Limit Exceeded</p>
                             <p class="text-gray-500 text-xs mt-4">Files larger than 50MB are stored as metadata only to prevent browser storage issues.</p>
-                            <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-cyber-yellow text-black font-bold uppercase tracking-widest font-mono text-xs">
+                            <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 text-cyber-blue font-bold lowercase tracking-widest text-xs">
                                 Understood
                             </button>
                         </div>
@@ -997,7 +1009,7 @@
                 
             } else if (isCached) {
                 // Download from browser cache (real file)
-                button.innerText = "TURBO DOWNLOAD ACTIVE";
+                button.innerText = "DOWNLOAD ACTIVE";
                 let progress = 0;
                 const startTime = Date.now();
                 const cacheKey = fileUrl.replace('cache://', '');
@@ -1026,8 +1038,8 @@
                             
                             // Show completion
                             button.innerText = "DOWNLOAD COMPLETE";
-                            button.classList.remove('bg-cyber-blue', 'text-black');
-                            button.classList.add('bg-cyber-green', 'text-white');
+                            button.classList.remove('bg-white', 'text-black');
+                            button.classList.add('bg-black', 'text-white');
                             progressEl.textContent = "100%";
                             barEl.style.width = "100%";
                             speedEl.textContent = "Complete";
@@ -1047,7 +1059,7 @@
                                         <h4 class="text-white font-bold text-lg mb-2">Cache Download Complete</h4>
                                         <p class="text-gray-400 text-sm font-mono">${fileName}</p>
                                         <p class="text-cyber-green text-xs font-mono mt-2">${formatFileSize(fileSize)} • Instant Access</p>
-                                        <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-cyber-green text-black font-bold uppercase tracking-widest font-mono text-xs">
+                                        <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-cyber-green text-black font-bold lowercase tracking-widests text-xs">
                                             Close
                                         </button>
                                     </div>
@@ -1088,7 +1100,7 @@
                     const startTime = Date.now();
                     let lastUpdateTime = startTime;
                     
-                    button.innerText = "TURBO DOWNLOAD ACTIVE";
+                    button.innerText = "DOWNLOAD ACTIVE";
                     
                     while (true) {
                         const { done, value } = await reader.read();
@@ -1128,8 +1140,8 @@
                     
                     // Show completion
                     button.innerText = "DOWNLOAD COMPLETE";
-                    button.classList.remove('bg-cyber-blue', 'text-black');
-                    button.classList.add('bg-cyber-green', 'text-white');
+                    button.classList.remove('bg-white', 'text-black');
+                    button.classList.add('bg-black', 'text-white');
                     progressEl.textContent = "100%";
                     barEl.style.width = "100%";
                     speedEl.textContent = "Complete";
@@ -1146,10 +1158,10 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                     </svg>
                                 </div>
-                                <h4 class="text-white font-bold text-lg mb-2">Turbo Download Complete</h4>
-                                <p class="text-gray-400 text-sm font-mono">${fileName}</p>
-                                <p class="text-cyber-green text-xs font-mono mt-2">${formatFileSize(fileSize)} • High-Speed Transfer</p>
-                                <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-cyber-green text-black font-bold uppercase tracking-widest font-mono text-xs">
+                                <h4 class="text-white font-bold text-lg mb-2">Download Complete</h4>
+                                <p class="text-gray-400 text-sm">${fileName}</p>
+                                <p class="text-cyber-green text-xs mt-2">${formatFileSize(fileSize)} • Fast Transfer</p>
+                                <button onclick="this.closest('.fixed').remove()" class="mt-6 px-6 py-2 bg-white text-black font-bold lowercase tracking-widest text-xs">
                                     Close
                                 </button>
                             </div>
@@ -1249,11 +1261,11 @@
                 document.getElementById('currentUserDisplay').innerText = currentUser;
                 const mobileDisplay = document.getElementById('currentUserDisplayMobile');
                 if (mobileDisplay) mobileDisplay.innerText = currentUser;
-                console.log('✅ Username synced across pages:', currentUser);
+                console.log('Username synced across pages:', currentUser);
             }
             if (e.key === 'userEmail') {
                 currentUserEmail = e.newValue || currentUserEmail;
-                console.log('✅ User email synced across pages:', currentUserEmail);
+                console.log('User email synced across pages:', currentUserEmail);
             }
         });
     </script>

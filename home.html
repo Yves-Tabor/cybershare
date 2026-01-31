@@ -159,7 +159,7 @@
             <div class="lg:w-1/4 space-y-6">
                 <div class="bg-black border-2 border-white p-6 rounded-2xl sticky top-28">
                     <h3 class="font-mono font-bold text-white mb-6 flex items-center gap-2 uppercase tracking-widest text-xs">
-                        <span class="w-2 h-2 bg-white rounded-full"></span> System_Resources
+                        <span class="w-2 h-2 bg-white rounded-full"></span> System Resources
                     </h3>
                     <div class="space-y-4">
                         <div class="p-4 bg-cyber-darker rounded-lg border border-white/5">
@@ -317,12 +317,12 @@
                 if (storedUsername && storedUsername !== 'ADMIN_NODE') {
                     // Use the custom display name
                     currentUser = storedUsername;
-                    console.log('✅ Using custom display name:', currentUser);
+                    console.log(' Using custom display name:', currentUser);
                 } else {
                     // Use email-based username as fallback
                     currentUser = user.email.split('@')[0].toUpperCase().replace(/[^A-Z0-9]/g, '_');
                     localStorage.setItem('username', currentUser);
-                    console.log('✅ Using email-based username:', currentUser);
+                    console.log(' Using email-based username:', currentUser);
                 }
                 
                 document.getElementById('currentUserDisplay').innerText = currentUser;
@@ -450,7 +450,7 @@
                 }, 2000);
                 
             } catch (e) {
-                console.error("❌ Transmission Failed:", e);
+                console.error(" Transmission Failed:", e);
                 console.error("Error code:", e.code);
                 console.error("Error message:", e.message);
                 
@@ -603,7 +603,7 @@
                 }, 1500);
                 
             } catch (e) {
-                console.error("❌ Comment Failed:", e);
+                console.error(" Comment Failed:", e);
                 alert("TRANSMISSION_ERROR: " + e.message);
                 btn.innerText = "FAILED - RETRY";
             } finally {
@@ -702,11 +702,11 @@
                 currentUser = newUsername;
                 document.getElementById('currentUserDisplay').innerText = currentUser;
                 document.getElementById('sidebarUsername').innerText = currentUser;
-                console.log('✅ Username synced across pages:', currentUser);
+                console.log('Username synced across pages:', currentUser);
             }
             if (e.key === 'userEmail') {
                 currentUserEmail = e.newValue || currentUserEmail;
-                console.log('✅ User email synced across pages:', currentUserEmail);
+                console.log('User email synced across pages:', currentUserEmail);
             }
         });
 
